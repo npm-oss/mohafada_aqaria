@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستخرجات العقود - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="negative-new.html">الشهادة السلبية</a></li>
+                <li><a href="contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">الرئيسية</a>
+                <span>/</span>
+                <span>مستخرجات العقود</span>
+            </nav>
+            <h1>📑 طلب مستخرج عقد</h1>
+            <p>استخراج نسخة رسمية من العقود المشهرة في المحافظة العقارية</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header" style="background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);">
+                    <div class="form-icon">📑</div>
+                    <h2>طلب مستخرج عقد</h2>
+                    <p>أدخل بيانات العقد المطلوب</p>
+                </div>
+
+                <form id="contractForm" class="main-form">
+                    <!-- Contract Type -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📋</span>
+                        <h3>نوع العقد</h3>
+                    </div>
+
+                    <div class="radio-group">
+                        <label class="radio-card">
+                            <input type="radio" name="contract_type" value="sale" checked>
+                            <span class="radio-content">
+                                <span class="radio-icon">🏠</span>
+                                <span class="radio-label">عقد بيع</span>
+                            </span>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="contract_type" value="donation">
+                            <span class="radio-content">
+                                <span class="radio-icon">🎁</span>
+                                <span class="radio-label">عقد هبة</span>
+                            </span>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="contract_type" value="inheritance">
+                            <span class="radio-content">
+                                <span class="radio-icon">📜</span>
+                                <span class="radio-label">فريضة / ميراث</span>
+                            </span>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="contract_type" value="mortgage">
+                            <span class="radio-content">
+                                <span class="radio-icon">🏦</span>
+                                <span class="radio-label">عقد رهن</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Contract Reference -->
+                    <div class="form-group-title">
+                        <span class="group-icon">🔢</span>
+                        <h3>مراجع العقد (إن كانت متوفرة)</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="contract_number">رقم الإشهار</label>
+                            <input type="text" id="contract_number" name="contract_number" placeholder="رقم الإشهار">
+                        </div>
+                        <div class="form-group">
+                            <label for="volume_number">رقم المجلد</label>
+                            <input type="text" id="volume_number" name="volume_number" placeholder="رقم المجلد">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract_date">تاريخ العقد التقريبي</label>
+                            <input type="date" id="contract_date" name="contract_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="notary_name">اسم الموثق</label>
+                            <input type="text" id="notary_name" name="notary_name" placeholder="اسم الموثق">
+                        </div>
+                    </div>
+
+                    <!-- Applicant Info -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👤</span>
+                        <h3>معلومات مقدم الطلب</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="applicant_nin">رقم التعريف الوطني *</label>
+                            <input type="text" id="applicant_nin" name="applicant_nin" required
+                                placeholder="رقم التعريف">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_lastname">اللقب *</label>
+                            <input type="text" id="applicant_lastname" name="applicant_lastname" required
+                                placeholder="اللقب">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_firstname">الاسم *</label>
+                            <input type="text" id="applicant_firstname" name="applicant_firstname" required
+                                placeholder="الاسم">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_father">اسم الأب</label>
+                            <input type="text" id="applicant_father" name="applicant_father" placeholder="اسم الأب">
+                        </div>
+                    </div>
+
+                    <!-- Parties -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👥</span>
+                        <h3>أطراف العقد</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="seller_name">البائع / المتنازل</label>
+                            <input type="text" id="seller_name" name="seller_name" placeholder="اسم البائع أو المتنازل">
+                        </div>
+                        <div class="form-group">
+                            <label for="buyer_name">المشتري / المستفيد</label>
+                            <input type="text" id="buyer_name" name="buyer_name" placeholder="اسم المشتري أو المستفيد">
+                        </div>
+                    </div>
+
+                    <!-- Property -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📍</span>
+                        <h3>موقع العقار</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="municipality">البلدية</label>
+                            <select id="municipality" name="municipality">
+                                <option value="">اختر البلدية</option>
+                                <option value="أولاد جلال">أولاد جلال</option>
+                                <option value="سيدي خالد">سيدي خالد</option>
+                                <option value="الدوسن">الدوسن</option>
+                                <option value="الشعيبة">الشعيبة</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">العنوان / الحي</label>
+                            <input type="text" id="address" name="address" placeholder="العنوان التقريبي">
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group full-width" style="margin-top: 20px;">
+                        <label for="notes">ملاحظات إضافية</label>
+                        <textarea id="notes" name="notes" rows="3"
+                            placeholder="أي معلومات إضافية تساعد في البحث عن العقد..."
+                            style="width:100%; padding:14px; border:2px solid var(--gray-200); border-radius:var(--radius); font-family:inherit;"></textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);">
+                            <span>إرسال الطلب</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">📑</div>
+                <h3>ما هو مستخرج العقد؟</h3>
+                <p style="color: var(--gray-600); margin-bottom: 16px;">
+                    نسخة رسمية مطابقة للأصل من عقد مشهر في المحافظة العقارية.
+                </p>
+                <ul>
+                    <li>يحمل ختم المحافظة الرسمي</li>
+                    <li>معترف به قانونياً</li>
+                    <li>مطلوب في المحاكم والبنوك</li>
+                    <li>يثبت الملكية والحقوق</li>
+                </ul>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-200);">
+                    <h4 style="font-size: 1rem; margin-bottom: 12px;">💡 نصيحة</h4>
+                    <p style="color: var(--gray-600); font-size: 0.9rem;">
+                        كلما كانت المعلومات المقدمة أكثر دقة، كلما تم إيجاد العقد بسرعة أكبر.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { FirebaseService } from './js/firebase-config.js';
+
+        const form = document.getElementById('contractForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const formData = {
+                request_type: 'contract',
+                request_type_ar: 'مستخرج عقد',
+                contract_type: form.querySelector('input[name="contract_type"]:checked').value,
+                contract_number: form.contract_number.value,
+                volume_number: form.volume_number.value,
+                contract_date: form.contract_date.value,
+                notary_name: form.notary_name.value,
+                applicant_nin: form.applicant_nin.value,
+                applicant_lastname: form.applicant_lastname.value,
+                applicant_firstname: form.applicant_firstname.value,
+                applicant_father: form.applicant_father.value,
+                seller_name: form.seller_name.value,
+                buyer_name: form.buyer_name.value,
+                municipality: form.municipality.value,
+                address: form.address.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                notes: form.notes.value
+            };
+
+            const result = await FirebaseService.createDocumentRequest(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلبك بنجاح!', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال الطلب</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

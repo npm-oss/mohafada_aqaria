@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البطاقة الأبجدية - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">الرئيسية</a></li>
+                <li><a href="../negative-new.html">الشهادة السلبية</a></li>
+                <li><a href="../contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <span>/</span>
+                <span>البطاقات العقارية</span>
+                <span>/</span>
+                <span>البطاقة الأبجدية</span>
+            </nav>
+            <h1>🔤 طلب البطاقة الأبجدية</h1>
+            <p>استخراج بطاقة عقارية مرتبة أبجدياً حسب أسماء الملاك</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header" style="background: linear-gradient(135deg, #059669 0%, #34d399 100%);">
+                    <div class="form-icon">🔤</div>
+                    <h2>طلب بطاقة أبجدية</h2>
+                    <p>البحث في السجل العقاري بالترتيب الأبجدي</p>
+                </div>
+
+                <form id="alphabeticalCardForm" class="main-form">
+                    <!-- Applicant Info -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👤</span>
+                        <h3>معلومات مقدم الطلب</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="applicant_nin">رقم التعريف الوطني *</label>
+                            <input type="text" id="applicant_nin" name="applicant_nin" required
+                                placeholder="أدخل رقم التعريف">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_lastname">اللقب *</label>
+                            <input type="text" id="applicant_lastname" name="applicant_lastname" required
+                                placeholder="اللقب">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_firstname">الاسم *</label>
+                            <input type="text" id="applicant_firstname" name="applicant_firstname" required
+                                placeholder="الاسم">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_father">اسم الأب</label>
+                            <input type="text" id="applicant_father" name="applicant_father" placeholder="اسم الأب">
+                        </div>
+                    </div>
+
+                    <!-- Search Criteria -->
+                    <div class="form-group-title">
+                        <span class="group-icon">🔍</span>
+                        <h3>معايير البحث</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="search_lastname">اللقب المطلوب البحث عنه *</label>
+                            <input type="text" id="search_lastname" name="search_lastname" required
+                                placeholder="أدخل اللقب للبحث">
+                        </div>
+                        <div class="form-group">
+                            <label for="search_firstname">الاسم (اختياري)</label>
+                            <input type="text" id="search_firstname" name="search_firstname" placeholder="الاسم إن وجد">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="search_municipality">البلدية</label>
+                            <select id="search_municipality" name="search_municipality">
+                                <option value="">جميع البلديات</option>
+                                <option value="أولاد جلال">أولاد جلال</option>
+                                <option value="سيدي خالد">سيدي خالد</option>
+                                <option value="الدوسن">الدوسن</option>
+                                <option value="الشعيبة">الشعيبة</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(135deg, #059669 0%, #34d399 100%);">
+                            <span>إرسال الطلب</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">🔤</div>
+                <h3>ما هي البطاقة الأبجدية؟</h3>
+                <p style="color: var(--gray-600); margin-bottom: 16px;">
+                    وثيقة تتيح البحث في السجل العقاري بناءً على الاسم واللقب بالترتيب الأبجدي.
+                </p>
+                <ul>
+                    <li>البحث السريع في السجلات</li>
+                    <li>التحقق من الملكيات</li>
+                    <li>مفيدة للمحامين والموثقين</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+
+        const form = document.getElementById('alphabeticalCardForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const formData = {
+                card_type: 'alphabetical',
+                card_type_ar: 'البطاقة الأبجدية',
+                applicant_type: 'person',
+                applicant_nin: form.applicant_nin.value,
+                applicant_lastname: form.applicant_lastname.value,
+                applicant_firstname: form.applicant_firstname.value,
+                applicant_father: form.applicant_father.value,
+                search_lastname: form.search_lastname.value,
+                search_firstname: form.search_firstname.value,
+                search_municipality: form.search_municipality.value,
+                email: form.email.value,
+                phone: form.phone.value
+            };
+
+            const result = await FirebaseService.createDocumentRequest(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلبك بنجاح!', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال الطلب</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="../js/main.js"></script>
+</body>
+
+</html>

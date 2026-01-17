@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البطاقة الريفية - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">الرئيسية</a></li>
+                <li><a href="../negative-new.html">الشهادة السلبية</a></li>
+                <li><a href="../contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <span>/</span>
+                <span>البطاقات العقارية</span>
+                <span>/</span>
+                <span>البطاقة الريفية</span>
+            </nav>
+            <h1>🌾 طلب البطاقة الريفية</h1>
+            <p>استخراج بطاقة عقارية للأراضي الفلاحية والريفية</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header" style="background: linear-gradient(135deg, #ca8a04 0%, #facc15 100%);">
+                    <div class="form-icon">🌾</div>
+                    <h2>طلب بطاقة ريفية</h2>
+                    <p>للأراضي الفلاحية والمناطق الريفية</p>
+                </div>
+
+                <form id="ruralCardForm" class="main-form">
+                    <!-- Applicant Info -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👤</span>
+                        <h3>معلومات مقدم الطلب</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="applicant_nin">رقم التعريف الوطني *</label>
+                            <input type="text" id="applicant_nin" name="applicant_nin" required
+                                placeholder="أدخل رقم التعريف">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_lastname">اللقب *</label>
+                            <input type="text" id="applicant_lastname" name="applicant_lastname" required
+                                placeholder="اللقب">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_firstname">الاسم *</label>
+                            <input type="text" id="applicant_firstname" name="applicant_firstname" required
+                                placeholder="الاسم">
+                        </div>
+                        <div class="form-group">
+                            <label for="applicant_father">اسم الأب</label>
+                            <input type="text" id="applicant_father" name="applicant_father" placeholder="اسم الأب">
+                        </div>
+                    </div>
+
+                    <!-- Property Location -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📍</span>
+                        <h3>موقع الأرض</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="municipality">البلدية *</label>
+                            <select id="municipality" name="municipality" required>
+                                <option value="">اختر البلدية</option>
+                                <option value="أولاد جلال">أولاد جلال</option>
+                                <option value="سيدي خالد">سيدي خالد</option>
+                                <option value="الدوسن">الدوسن</option>
+                                <option value="الشعيبة">الشعيبة</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="locality">المكان / الدوار</label>
+                            <input type="text" id="locality" name="locality" placeholder="اسم المكان أو الدوار">
+                        </div>
+                        <div class="form-group">
+                            <label for="subdivision_number">رقم التجزئة</label>
+                            <input type="text" id="subdivision_number" name="subdivision_number"
+                                placeholder="رقم التجزئة">
+                        </div>
+                        <div class="form-group">
+                            <label for="parcel_number">رقم القطعة</label>
+                            <input type="text" id="parcel_number" name="parcel_number" placeholder="رقم القطعة">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="area">المساحة التقريبية (هكتار)</label>
+                            <input type="text" id="area" name="area" placeholder="مثال: 2.5 هكتار">
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(135deg, #ca8a04 0%, #facc15 100%); color: #422006;">
+                            <span>إرسال الطلب</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">🌾</div>
+                <h3>ما هي البطاقة الريفية؟</h3>
+                <p style="color: var(--gray-600); margin-bottom: 16px;">
+                    وثيقة خاصة بالأراضي الفلاحية والريفية خارج المناطق الحضرية.
+                </p>
+                <ul>
+                    <li>للأراضي الفلاحية</li>
+                    <li>للمناطق غير الممسوحة</li>
+                    <li>ضرورية للاستثمار الفلاحي</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+
+        const form = document.getElementById('ruralCardForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const formData = {
+                card_type: 'rural',
+                card_type_ar: 'البطاقة الريفية',
+                property_status: 'rural',
+                applicant_type: 'person',
+                applicant_nin: form.applicant_nin.value,
+                applicant_lastname: form.applicant_lastname.value,
+                applicant_firstname: form.applicant_firstname.value,
+                applicant_father: form.applicant_father.value,
+                municipality: form.municipality.value,
+                locality: form.locality.value,
+                subdivision_number: form.subdivision_number.value,
+                parcel_number: form.parcel_number.value,
+                area: form.area.value,
+                email: form.email.value,
+                phone: form.phone.value
+            };
+
+            const result = await FirebaseService.createDocumentRequest(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلبك بنجاح!', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال الطلب</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="../js/main.js"></script>
+</body>
+
+</html>

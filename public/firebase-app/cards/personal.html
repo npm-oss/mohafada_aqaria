@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البطاقة الشخصية - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">الرئيسية</a></li>
+                <li><a href="../negative-new.html">الشهادة السلبية</a></li>
+                <li><a href="../contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="../index.html">الرئيسية</a>
+                <span>/</span>
+                <span>البطاقات العقارية</span>
+                <span>/</span>
+                <span>البطاقة الشخصية</span>
+            </nav>
+            <h1>🪪 طلب البطاقة الشخصية</h1>
+            <p>استخراج بطاقة عقارية تحتوي على جميع العقارات المسجلة باسم شخص معين</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header" style="background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);">
+                    <div class="form-icon">🪪</div>
+                    <h2>طلب بطاقة شخصية</h2>
+                    <p>أدخل بيانات صاحب البطاقة</p>
+                </div>
+
+                <form id="personalCardForm" class="main-form">
+                    <!-- Applicant Type -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📋</span>
+                        <h3>نوع مقدم الطلب</h3>
+                    </div>
+
+                    <div class="radio-group">
+                        <label class="radio-card">
+                            <input type="radio" name="applicant_type" value="person" checked
+                                onchange="toggleApplicantType()">
+                            <span class="radio-content">
+                                <span class="radio-icon">👤</span>
+                                <span class="radio-label">شخص طبيعي</span>
+                            </span>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="applicant_type" value="company" onchange="toggleApplicantType()">
+                            <span class="radio-content">
+                                <span class="radio-icon">🏢</span>
+                                <span class="radio-label">شركة / مؤسسة</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Person Fields -->
+                    <div id="personFields">
+                        <div class="form-group-title">
+                            <span class="group-icon">👤</span>
+                            <h3>معلومات مقدم الطلب</h3>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="applicant_nin">رقم التعريف الوطني *</label>
+                                <input type="text" id="applicant_nin" name="applicant_nin" required
+                                    placeholder="أدخل رقم التعريف">
+                            </div>
+                            <div class="form-group">
+                                <label for="applicant_lastname">اللقب *</label>
+                                <input type="text" id="applicant_lastname" name="applicant_lastname" required
+                                    placeholder="اللقب">
+                            </div>
+                            <div class="form-group">
+                                <label for="applicant_firstname">الاسم *</label>
+                                <input type="text" id="applicant_firstname" name="applicant_firstname" required
+                                    placeholder="الاسم">
+                            </div>
+                            <div class="form-group">
+                                <label for="applicant_father">اسم الأب</label>
+                                <input type="text" id="applicant_father" name="applicant_father" placeholder="اسم الأب">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Company Fields -->
+                    <div id="companyFields" style="display: none;">
+                        <div class="form-group-title">
+                            <span class="group-icon">🏢</span>
+                            <h3>معلومات الشركة</h3>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="company_nin">رقم السجل التجاري *</label>
+                                <input type="text" id="company_nin" name="company_nin" placeholder="رقم السجل التجاري">
+                            </div>
+                            <div class="form-group">
+                                <label for="company_name">اسم الشركة *</label>
+                                <input type="text" id="company_name" name="company_name" placeholder="اسم الشركة">
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="company_representative">ممثل الشركة</label>
+                                <input type="text" id="company_representative" name="company_representative"
+                                    placeholder="اسم الممثل القانوني">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Owner Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">🏠</span>
+                        <h3>معلومات صاحب العقار المطلوب</h3>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="same_owner" onchange="toggleOwnerFields()">
+                        <label for="same_owner">صاحب العقار هو نفس مقدم الطلب</label>
+                    </div>
+
+                    <div class="form-grid" id="ownerFields">
+                        <div class="form-group">
+                            <label for="owner_nin">رقم التعريف الوطني *</label>
+                            <input type="text" id="owner_nin" name="owner_nin" required placeholder="رقم التعريف">
+                        </div>
+                        <div class="form-group">
+                            <label for="owner_lastname">اللقب *</label>
+                            <input type="text" id="owner_lastname" name="owner_lastname" required placeholder="اللقب">
+                        </div>
+                        <div class="form-group">
+                            <label for="owner_firstname">الاسم *</label>
+                            <input type="text" id="owner_firstname" name="owner_firstname" required placeholder="الاسم">
+                        </div>
+                        <div class="form-group">
+                            <label for="owner_father">اسم الأب</label>
+                            <input type="text" id="owner_father" name="owner_father" placeholder="اسم الأب">
+                        </div>
+                        <div class="form-group">
+                            <label for="owner_birthdate">تاريخ الميلاد</label>
+                            <input type="date" id="owner_birthdate" name="owner_birthdate">
+                        </div>
+                        <div class="form-group">
+                            <label for="owner_birthplace">مكان الميلاد</label>
+                            <input type="text" id="owner_birthplace" name="owner_birthplace" placeholder="مكان الميلاد">
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);">
+                            <span>إرسال الطلب</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">🪪</div>
+                <h3>ما هي البطاقة الشخصية؟</h3>
+                <p style="color: var(--gray-600); margin-bottom: 16px;">
+                    وثيقة رسمية تحتوي على قائمة بجميع العقارات المسجلة باسم شخص معين في المحافظة العقارية.
+                </p>
+                <ul>
+                    <li>تثبت ملكية العقارات</li>
+                    <li>مطلوبة في المعاملات البنكية</li>
+                    <li>ضرورية للإجراءات القانونية</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+
+        const form = document.getElementById('personalCardForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const applicantType = form.querySelector('input[name="applicant_type"]:checked').value;
+
+            const formData = {
+                card_type: 'personal',
+                card_type_ar: 'البطاقة الشخصية',
+                applicant_type: applicantType,
+                applicant_nin: applicantType === 'person' ? form.applicant_nin.value : form.company_nin.value,
+                applicant_lastname: applicantType === 'person' ? form.applicant_lastname.value : form.company_name.value,
+                applicant_firstname: applicantType === 'person' ? form.applicant_firstname.value : form.company_representative.value,
+                applicant_father: form.applicant_father?.value || '',
+                owner_nin: form.owner_nin.value,
+                owner_lastname: form.owner_lastname.value,
+                owner_firstname: form.owner_firstname.value,
+                owner_father: form.owner_father.value,
+                owner_birthdate: form.owner_birthdate.value,
+                owner_birthplace: form.owner_birthplace.value,
+                email: form.email.value,
+                phone: form.phone.value
+            };
+
+            const result = await FirebaseService.createDocumentRequest(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلبك بنجاح!', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال الطلب</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="../js/main.js"></script>
+    <script>
+        function toggleApplicantType() {
+            const type = document.querySelector('input[name="applicant_type"]:checked').value;
+            document.getElementById('personFields').style.display = type === 'person' ? 'block' : 'none';
+            document.getElementById('companyFields').style.display = type === 'company' ? 'block' : 'none';
+        }
+
+        function toggleOwnerFields() {
+            const same = document.getElementById('same_owner').checked;
+            const fields = document.getElementById('ownerFields');
+            fields.style.opacity = same ? '0.5' : '1';
+            fields.querySelectorAll('input').forEach(input => input.disabled = same);
+        }
+    </script>
+</body>
+
+</html>

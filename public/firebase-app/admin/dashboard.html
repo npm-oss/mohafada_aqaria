@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الطلبات - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body class="admin-body">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">🏛️</span>
+            <span class="logo-text">المحافظة العقارية</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                <span>لوحة التحكم</span>
+            </a>
+            <a href="certificates.html" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span>الشهادات السلبية</span>
+                <span class="badge" id="certBadge">0</span>
+            </a>
+            <a href="documents.html" class="nav-item">
+                <span class="nav-icon">📄</span>
+                <span>طلبات الوثائق</span>
+                <span class="badge" id="docBadge">0</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span class="nav-icon">💬</span>
+                <span>الرسائل</span>
+                <span class="badge" id="msgBadge">0</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">
+                <span>🚪</span>
+                <span>تسجيل الخروج</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h1>لوحة التحكم</h1>
+            <div class="user-info">
+                <span class="user-avatar">👨‍💼</span>
+                <span class="user-name" id="userName">المدير</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Stats Cards -->
+            <div class="stats-row">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">📜</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="totalCertificates">0</div>
+                        <div class="stat-label">شهادة سلبية</div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="totalDocuments">0</div>
+                        <div class="stat-label">طلب وثائق</div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="pendingRequests">0</div>
+                        <div class="stat-label">قيد الانتظار</div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-info">
+                    <div class="stat-icon">💬</div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="totalMessages">0</div>
+                        <div class="stat-label">رسالة</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Certificates -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📜 آخر طلبات الشهادات السلبية</h2>
+                    <a href="certificates.html" class="view-all">عرض الكل ←</a>
+                </div>
+                <div class="card-body">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>البريد</th>
+                                <th>النوع</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentCertificates">
+                            <tr>
+                                <td colspan="6" class="loading-cell">
+                                    <div class="loading-spinner"></div>
+                                    جاري التحميل...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Documents -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📄 آخر طلبات الوثائق</h2>
+                    <a href="documents.html" class="view-all">عرض الكل ←</a>
+                </div>
+                <div class="card-body">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>نوع الطلب</th>
+                                <th>البلدية</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentDocuments">
+                            <tr>
+                                <td colspan="6" class="loading-cell">
+                                    <div class="loading-spinner"></div>
+                                    جاري التحميل...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Messages -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>💬 آخر الرسائل</h2>
+                    <a href="messages.html" class="view-all">عرض الكل ←</a>
+                </div>
+                <div class="card-body">
+                    <div class="messages-list" id="recentMessages">
+                        <div class="loading-cell">
+                            <div class="loading-spinner"></div>
+                            جاري التحميل...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+
+        // Check authentication
+        FirebaseService.onAuthChange((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('userName').textContent = user.email.split('@')[0];
+                loadDashboardData();
+            }
+        });
+
+        async function loadDashboardData() {
+            // Load certificates
+            const certificates = await FirebaseService.getNegativeCertificates();
+            const pendingCerts = certificates.filter(c => c.status === 'pending').length;
+
+            document.getElementById('totalCertificates').textContent = certificates.length;
+            document.getElementById('certBadge').textContent = pendingCerts;
+
+            // Display recent certificates
+            const certTbody = document.getElementById('recentCertificates');
+            if (certificates.length === 0) {
+                certTbody.innerHTML = '<tr><td colspan="6" class="empty-cell">لا توجد طلبات حالياً</td></tr>';
+            } else {
+                certTbody.innerHTML = certificates.slice(0, 5).map(cert => `
+                    <tr>
+                        <td>${cert.owner_firstname || ''} ${cert.owner_lastname || ''}</td>
+                        <td>${cert.email || '-'}</td>
+                        <td>${cert.type || 'جديدة'}</td>
+                        <td><span class="status-badge status-${cert.status}">${getStatusLabel(cert.status)}</span></td>
+                        <td>${formatDate(cert.created_at)}</td>
+                        <td>
+                            <button class="action-btn action-approve" onclick="updateStatus('negative_certificates', '${cert.id}', 'approved')">✓</button>
+                            <button class="action-btn action-reject" onclick="updateStatus('negative_certificates', '${cert.id}', 'rejected')">✗</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Load documents
+            const documents = await FirebaseService.getDocumentRequests();
+            const pendingDocs = documents.filter(d => d.status === 'pending').length;
+
+            document.getElementById('totalDocuments').textContent = documents.length;
+            document.getElementById('docBadge').textContent = pendingDocs;
+            document.getElementById('pendingRequests').textContent = pendingCerts + pendingDocs;
+
+            // Display recent documents
+            const docTbody = document.getElementById('recentDocuments');
+            if (documents.length === 0) {
+                docTbody.innerHTML = '<tr><td colspan="6" class="empty-cell">لا توجد طلبات حالياً</td></tr>';
+            } else {
+                docTbody.innerHTML = documents.slice(0, 5).map(doc => `
+                    <tr>
+                        <td>${doc.applicant_firstname || ''} ${doc.applicant_lastname || ''}</td>
+                        <td>${doc.card_type_ar || doc.request_type_ar || doc.card_type || '-'}</td>
+                        <td>${doc.municipality || '-'}</td>
+                        <td><span class="status-badge status-${doc.status}">${getStatusLabel(doc.status)}</span></td>
+                        <td>${formatDate(doc.created_at)}</td>
+                        <td>
+                            <button class="action-btn action-approve" onclick="updateStatus('documents_requests', '${doc.id}', 'approved')">✓</button>
+                            <button class="action-btn action-reject" onclick="updateStatus('documents_requests', '${doc.id}', 'rejected')">✗</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Load messages
+            const messages = await FirebaseService.getContacts();
+            document.getElementById('totalMessages').textContent = messages.length;
+            document.getElementById('msgBadge').textContent = messages.filter(m => !m.read).length;
+
+            const messagesList = document.getElementById('recentMessages');
+            if (messages.length === 0) {
+                messagesList.innerHTML = '<div class="empty-cell">لا توجد رسائل</div>';
+            } else {
+                messagesList.innerHTML = messages.slice(0, 3).map(msg => `
+                    <div class="message-item ${msg.read ? '' : 'unread'}">
+                        <div class="message-avatar">${(msg.name || 'م').charAt(0)}</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-name">${msg.name || 'مجهول'}</span>
+                                <span class="message-date">${formatDate(msg.created_at)}</span>
+                            </div>
+                            <div class="message-subject">${msg.subject || 'بدون موضوع'}</div>
+                            <div class="message-preview">${(msg.message || '').substring(0, 80)}...</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'قيد الانتظار',
+                'processing': 'قيد المعالجة',
+                'approved': 'تمت الموافقة',
+                'rejected': 'مرفوض',
+                'extracted': 'تم الاستخراج'
+            };
+            return labels[status] || status || 'غير محدد';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-DZ');
+        }
+
+        window.handleLogout = async function () {
+            await FirebaseService.logout();
+            window.location.href = 'login.html';
+        };
+
+        window.updateStatus = async function (collection, id, status) {
+            if (collection === 'negative_certificates') {
+                await FirebaseService.updateCertificateStatus(id, status);
+            }
+            // Reload data
+            loadDashboardData();
+        };
+    </script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
+
+    <style>
+        .action-approve {
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: #059669 !important;
+        }
+
+        .action-approve:hover {
+            background: #10b981 !important;
+            color: white !important;
+        }
+
+        .action-reject {
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: #dc2626 !important;
+            margin-right: 4px;
+        }
+
+        .action-reject:hover {
+            background: #ef4444 !important;
+            color: white !important;
+        }
+    </style>
+</body>
+
+</html>

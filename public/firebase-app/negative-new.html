@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب شهادة سلبية جديدة - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="negative-new.html" class="active">الشهادة السلبية</a></li>
+                <li><a href="contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">الرئيسية</a>
+                <span>/</span>
+                <span>طلب شهادة سلبية جديدة</span>
+            </nav>
+            <h1>📜 طلب شهادة سلبية جديدة</h1>
+            <p>شهادة تثبت عدم وجود عقار مسجل باسم الشخص المعني</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header">
+                    <div class="form-icon">📋</div>
+                    <h2>معلومات الطلب</h2>
+                    <p>يرجى ملء جميع الحقول المطلوبة بدقة</p>
+                </div>
+
+                <form id="negativeCertificateForm" class="main-form">
+                    <!-- Owner Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👤</span>
+                        <h3>معلومات صاحب الشهادة</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="owner_lastname">اللقب *</label>
+                            <input type="text" id="owner_lastname" name="owner_lastname" required
+                                placeholder="أدخل اللقب">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_firstname">الاسم *</label>
+                            <input type="text" id="owner_firstname" name="owner_firstname" required
+                                placeholder="أدخل الاسم">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_father">اسم الأب</label>
+                            <input type="text" id="owner_father" name="owner_father" placeholder="اسم الأب">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_birthdate">تاريخ الميلاد</label>
+                            <input type="date" id="owner_birthdate" name="owner_birthdate">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="owner_birthplace">مكان الميلاد</label>
+                            <input type="text" id="owner_birthplace" name="owner_birthplace"
+                                placeholder="أدخل مكان الميلاد">
+                        </div>
+                    </div>
+
+                    <!-- Applicant Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📝</span>
+                        <h3>معلومات مقدم الطلب (إن كان مختلفاً)</h3>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="same_person" onchange="toggleApplicantFields()">
+                        <label for="same_person">مقدم الطلب هو نفس صاحب الشهادة</label>
+                    </div>
+
+                    <div class="form-grid" id="applicantFields">
+                        <div class="form-group">
+                            <label for="applicant_lastname">لقب مقدم الطلب</label>
+                            <input type="text" id="applicant_lastname" name="applicant_lastname" placeholder="اللقب">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="applicant_firstname">اسم مقدم الطلب</label>
+                            <input type="text" id="applicant_firstname" name="applicant_firstname" placeholder="الاسم">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="applicant_father">اسم أب مقدم الطلب</label>
+                            <input type="text" id="applicant_father" name="applicant_father" placeholder="اسم الأب">
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف</label>
+                            <input type="tel" id="phone" name="phone" placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Request Type -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📋</span>
+                        <h3>نوع الطلب</h3>
+                    </div>
+
+                    <div class="radio-group">
+                        <label class="radio-card">
+                            <input type="radio" name="type" value="جديدة" checked>
+                            <span class="radio-content">
+                                <span class="radio-icon">➕</span>
+                                <span class="radio-label">شهادة جديدة</span>
+                            </span>
+                        </label>
+
+                        <label class="radio-card">
+                            <input type="radio" name="type" value="إعادة استخراج">
+                            <span class="radio-content">
+                                <span class="radio-icon">🔁</span>
+                                <span class="radio-label">إعادة استخراج</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <span>إرسال الطلب</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">ℹ️</div>
+                <h3>معلومات هامة</h3>
+                <ul>
+                    <li>تأكد من صحة جميع المعلومات المدخلة</li>
+                    <li>سيتم إرسال إشعار على بريدك الإلكتروني عند معالجة الطلب</li>
+                    <li>مدة المعالجة: 24-48 ساعة عمل</li>
+                    <li>للاستفسار: اتصل بنا على الرقم الموجود في الموقع</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { FirebaseService } from './js/firebase-config.js';
+
+        const form = document.getElementById('negativeCertificateForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const formData = {
+                owner_lastname: form.owner_lastname.value,
+                owner_firstname: form.owner_firstname.value,
+                owner_father: form.owner_father.value,
+                owner_birthdate: form.owner_birthdate.value,
+                owner_birthplace: form.owner_birthplace.value,
+                applicant_lastname: form.applicant_lastname.value,
+                applicant_firstname: form.applicant_firstname.value,
+                applicant_father: form.applicant_father.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                type: form.querySelector('input[name="type"]:checked').value
+            };
+
+            const result = await FirebaseService.createNegativeCertificate(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال الطلب</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="js/main.js"></script>
+    <script>
+        function toggleApplicantFields() {
+            const fields = document.getElementById('applicantFields');
+            const checkbox = document.getElementById('same_person');
+            fields.style.opacity = checkbox.checked ? '0.5' : '1';
+            fields.querySelectorAll('input').forEach(input => {
+                input.disabled = checkbox.checked;
+            });
+        }
+    </script>
+</body>
+
+</html>

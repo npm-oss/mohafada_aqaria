@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعادة استخراج شهادة سلبية - المحافظة العقارية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/forms.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar scrolled">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🏛️</span>
+                <span class="logo-text">المحافظة العقارية</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="negative-new.html">الشهادة السلبية</a></li>
+                <li><a href="contact.html">اتصل بنا</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="index.html">الرئيسية</a>
+                <span>/</span>
+                <a href="negative-new.html">الشهادة السلبية</a>
+                <span>/</span>
+                <span>إعادة استخراج</span>
+            </nav>
+            <h1>🔁 إعادة استخراج شهادة سلبية</h1>
+            <p>طلب نسخة جديدة من شهادة سلبية صادرة مسبقاً</p>
+        </div>
+    </header>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-card">
+                <div class="form-header" style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);">
+                    <div class="form-icon">🔄</div>
+                    <h2>طلب إعادة استخراج</h2>
+                    <p>أدخل بيانات الشهادة السابقة</p>
+                </div>
+
+                <form id="reprintForm" class="main-form">
+                    <!-- Previous Certificate Info -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📜</span>
+                        <h3>معلومات الشهادة السابقة</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="certificate_number">رقم الشهادة السابقة (إن وجد)</label>
+                            <input type="text" id="certificate_number" name="certificate_number"
+                                placeholder="مثال: NC-2025-1234">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issue_date">تاريخ الإصدار التقريبي</label>
+                            <input type="date" id="issue_date" name="issue_date">
+                        </div>
+                    </div>
+
+                    <!-- Owner Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">👤</span>
+                        <h3>معلومات صاحب الشهادة</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="owner_lastname">اللقب *</label>
+                            <input type="text" id="owner_lastname" name="owner_lastname" required
+                                placeholder="أدخل اللقب">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_firstname">الاسم *</label>
+                            <input type="text" id="owner_firstname" name="owner_firstname" required
+                                placeholder="أدخل الاسم">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_father">اسم الأب</label>
+                            <input type="text" id="owner_father" name="owner_father" placeholder="اسم الأب">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_birthdate">تاريخ الميلاد</label>
+                            <input type="date" id="owner_birthdate" name="owner_birthdate">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="owner_birthplace">مكان الميلاد</label>
+                            <input type="text" id="owner_birthplace" name="owner_birthplace"
+                                placeholder="أدخل مكان الميلاد">
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📞</span>
+                        <h3>معلومات الاتصال</h3>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني *</label>
+                            <input type="email" id="email" name="email" required placeholder="example@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">رقم الهاتف *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="0XX XXX XXXX" dir="ltr">
+                        </div>
+                    </div>
+
+                    <!-- Reason -->
+                    <div class="form-group-title">
+                        <span class="group-icon">📋</span>
+                        <h3>سبب إعادة الاستخراج</h3>
+                    </div>
+
+                    <div class="radio-group radio-vertical">
+                        <label class="radio-card-horizontal">
+                            <input type="radio" name="reason" value="ضياع الشهادة" checked>
+                            <span class="radio-content-h">
+                                <span class="radio-icon">📄</span>
+                                <span class="radio-label">ضياع الشهادة</span>
+                            </span>
+                        </label>
+
+                        <label class="radio-card-horizontal">
+                            <input type="radio" name="reason" value="تلف الشهادة">
+                            <span class="radio-content-h">
+                                <span class="radio-icon">📃</span>
+                                <span class="radio-label">تلف الشهادة</span>
+                            </span>
+                        </label>
+
+                        <label class="radio-card-horizontal">
+                            <input type="radio" name="reason" value="انتهاء الصلاحية">
+                            <span class="radio-content-h">
+                                <span class="radio-icon">⏰</span>
+                                <span class="radio-label">انتهاء الصلاحية</span>
+                            </span>
+                        </label>
+
+                        <label class="radio-card-horizontal">
+                            <input type="radio" name="reason" value="نسخة إضافية">
+                            <span class="radio-content-h">
+                                <span class="radio-icon">📑</span>
+                                <span class="radio-label">الحاجة لنسخة إضافية</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Additional Notes -->
+                    <div class="form-group full-width" style="margin-top: 20px;">
+                        <label for="notes">ملاحظات إضافية (اختياري)</label>
+                        <textarea id="notes" name="notes" rows="3"
+                            placeholder="أي ملاحظات أو تفاصيل إضافية..."></textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                            style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);">
+                            <span>إرسال طلب إعادة الاستخراج</span>
+                            <span class="btn-arrow">←</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">ℹ️</div>
+                <h3>معلومات هامة</h3>
+                <ul>
+                    <li>رقم الشهادة السابقة يساعد في تسريع المعالجة</li>
+                    <li>تأكد من صحة معلومات صاحب الشهادة</li>
+                    <li>سيتم إرسال إشعار على بريدك الإلكتروني</li>
+                    <li>مدة المعالجة: 24-48 ساعة عمل</li>
+                </ul>
+
+                <div class="info-divider"></div>
+
+                <h4>🔗 روابط سريعة</h4>
+                <a href="negative-new.html" class="quick-link">➕ طلب شهادة جديدة</a>
+                <a href="contact.html" class="quick-link">💬 تواصل معنا</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🏛️</span>
+                    <span>المحافظة العقارية - أولاد جلال</span>
+                </div>
+                <p class="footer-text">جميع الحقوق محفوظة © 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { FirebaseService } from './js/firebase-config.js';
+
+        const form = document.getElementById('reprintForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+
+            const formData = {
+                certificate_number: form.certificate_number.value,
+                issue_date: form.issue_date.value,
+                owner_lastname: form.owner_lastname.value,
+                owner_firstname: form.owner_firstname.value,
+                owner_father: form.owner_father.value,
+                owner_birthdate: form.owner_birthdate.value,
+                owner_birthplace: form.owner_birthplace.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                reason: form.querySelector('input[name="reason"]:checked').value,
+                notes: form.notes.value,
+                type: 'إعادة استخراج'
+            };
+
+            const result = await FirebaseService.createNegativeCertificate(formData);
+
+            if (result.success) {
+                showNotification('تم إرسال طلب إعادة الاستخراج بنجاح! سيتم التواصل معك قريباً', 'success');
+                form.reset();
+            } else {
+                showNotification('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى', 'error');
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>إرسال طلب إعادة الاستخراج</span><span class="btn-arrow">←</span>';
+        });
+    </script>
+    <script src="js/main.js"></script>
+
+    <style>
+        /* Additional styles for reprint page */
+        .radio-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-card-horizontal {
+            position: relative;
+            cursor: pointer;
+            display: block;
+        }
+
+        .radio-card-horizontal input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-content-h {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 24px;
+            background: var(--gray-100);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .radio-card-horizontal input:checked+.radio-content-h {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: #7c3aed;
+        }
+
+        .radio-content-h .radio-icon {
+            font-size: 1.5rem;
+        }
+
+        .radio-content-h .radio-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .info-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 20px 0;
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 12px;
+        }
+
+        .quick-link {
+            display: block;
+            padding: 12px 16px;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+            color: var(--gray-700);
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .quick-link:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: var(--transition);
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+    </style>
+</body>
+
+</html>
