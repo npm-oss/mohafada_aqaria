@@ -29,6 +29,12 @@
             <h1>💬 الرسائل</h1>
         </header>
         <div class="dashboard-content">
+            <!-- Filter Bar -->
+            <div class="filters-bar">
+                <input type="date" id="dateFilter" onchange="filterData()" placeholder="تاريخ">
+                <input type="text" id="searchInput" placeholder="🔍 بحث (الاسم، البريد، الموضوع)..." onkeyup="filterData()">
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <h2>جميع الرسائل</h2><span class="total-count" id="totalCount">0</span>
@@ -42,18 +48,62 @@
                 </div>
             </div>
         </div>
+
+        <!-- Message Details Modal -->
+        <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>تفاصيل الرسالة</h2>
+                    <button class="close-modal" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    <!-- Content will be injected -->
+                </div>
+            </div>
+        </div>
     </main>
     <script type="module">
-        import { FirebaseService, db } from '../js/firebase-config.js';
-        import { doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { FirebaseService } from '../js/firebase-config.js';
+        
+        let allMessages = [];
+
         FirebaseService.onAuthChange(u => { if (!u) window.location.href = 'login.html'; else loadMessages(); });
+        
         async function loadMessages() {
-            const msgs = await FirebaseService.getContacts();
+            allMessages = await FirebaseService.getContacts();
+            displayMessages(allMessages);
+        }
+
+        window.filterData = function() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const date = document.getElementById('dateFilter').value;
+
+            let filtered = allMessages;
+
+            if (search) {
+                filtered = filtered.filter(m => 
+                    (m.name || '').toLowerCase().includes(search) ||
+                    (m.email || '').toLowerCase().includes(search) ||
+                    (m.subject || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (date) {
+                filtered = filtered.filter(m => {
+                    if (!m.created_at) return false;
+                    return m.created_at.startsWith(date);
+                });
+            }
+
+            displayMessages(filtered);
+        };
+
+        function displayMessages(msgs) {
             document.getElementById('totalCount').textContent = msgs.length + ' رسالة';
             const list = document.getElementById('messagesList');
             if (!msgs.length) { list.innerHTML = '<div class="empty-cell">لا توجد رسائل</div>'; return; }
             list.innerHTML = msgs.map(m => `
-                <div class="message-card ${m.read ? '' : 'unread'}" onclick="markRead('${m.id}')">
+                <div class="message-card ${m.read ? '' : 'unread'}" onclick="openMessage('${m.id}')">
                     <div class="msg-header">
                         <div class="msg-avatar">${(m.name || 'م').charAt(0)}</div>
                         <div class="msg-info">
@@ -62,21 +112,69 @@
                         </div>
                         <span class="msg-date">${m.created_at ? new Date(m.created_at).toLocaleDateString('ar-DZ') : '-'}</span>
                     </div>
-                    <div class="msg-body"><p>${m.message || ''}</p></div>
+                    <div class="msg-preview"><p>${(m.message || '').substring(0, 100)}${(m.message || '').length > 100 ? '...' : ''}</p></div>
                     <div class="msg-footer">
-                        <span>📧 ${m.email || '-'}</span>
-                        <span dir="ltr">📞 ${m.phone || '-'}</span>
                         <button class="del-btn" onclick="event.stopPropagation();delMsg('${m.id}')">🗑️ حذف</button>
                     </div>
                 </div>
             `).join('');
         }
-        window.markRead = async function (id) { await updateDoc(doc(db, 'contacts', id), { read: true }); };
-        window.delMsg = async function (id) { if (confirm('هل تريد حذف هذه الرسالة؟')) { await deleteDoc(doc(db, 'contacts', id)); loadMessages(); } };
+
+        window.openMessage = async function(id) {
+            const m = allMessages.find(msg => msg.id === id);
+            if (!m) return;
+
+            // Mark as read
+            if (!m.read) {
+                await FirebaseService.updateContactReadStatus(id, true);
+                m.read = true;
+                displayMessages(allMessages); // Refresh UI to remove notification dot if any (or unread style)
+            }
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-row"><strong>الاسم:</strong> <span>${m.name}</span></div>
+                <div class="detail-row"><strong>البريد:</strong> <span>${m.email}</span></div>
+                <div class="detail-row"><strong>الهاتف:</strong> <span dir="ltr">${m.phone || '-'}</span></div>
+                <div class="detail-row"><strong>الموضوع:</strong> <span>${m.subject}</span></div>
+                <div class="detail-row"><strong>التاريخ:</strong> <span>${m.created_at ? new Date(m.created_at).toLocaleString('ar-DZ') : '-'}</span></div>
+                <hr>
+                <div class="detail-content">
+                    <strong>الرسالة:</strong>
+                    <p>${m.message}</p>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.add('active');
+        };
+
+        window.closeModal = function(e) {
+            if (e && e.target !== document.getElementById('modalOverlay') && !e.target.classList.contains('close-modal')) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        };
+
+        window.delMsg = async function (id) {
+            if (confirm('هل تريد حذف هذه الرسالة؟')) {
+                await FirebaseService.deleteContact(id);
+                loadMessages();
+            }
+        };
+
         window.handleLogout = async function () { await FirebaseService.logout(); window.location.href = 'login.html'; };
     </script>
     <script>function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }</script>
     <style>
+        .filters-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .filters-bar input {
+            padding: 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+        }
+        .filters-bar #searchInput { flex: 1; }
+
         .message-card {
             background: var(--white);
             border-radius: var(--radius);
@@ -135,28 +233,18 @@
             font-size: .85rem
         }
 
-        .msg-body {
-            padding: 16px;
-            background: var(--gray-100);
-            border-radius: var(--radius-sm);
-            margin-bottom: 12px
-        }
-
-        .msg-body p {
-            color: var(--gray-700);
-            line-height: 1.7
+        .msg-preview {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
         }
 
         .msg-footer {
             display: flex;
-            gap: 20px;
-            color: var(--gray-500);
-            font-size: .9rem;
-            align-items: center
+            justify-content: flex-end;
         }
 
         .del-btn {
-            margin-right: auto;
             background: rgba(239, 68, 68, .1);
             color: #dc2626;
             border: none;
@@ -176,6 +264,72 @@
             padding: 6px 16px;
             border-radius: 50px;
             font-size: .9rem
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 10px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .detail-row {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-content {
+            margin-top: 16px;
+        }
+        
+        .detail-content p {
+            background: var(--gray-100);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            line-height: 1.6;
         }
     </style>
 </body>

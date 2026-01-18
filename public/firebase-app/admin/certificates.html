@@ -67,7 +67,12 @@
                     <option value="rejected">مرفوض</option>
                     <option value="extracted">تم الاستخراج</option>
                 </select>
-                <input type="text" id="searchInput" placeholder="🔍 بحث..." onkeyup="filterData()">
+                <select id="municipalityFilter" onchange="filterData()">
+                    <option value="">كل المناطق (مكان الميلاد)</option>
+                    <!-- Populated dynamically -->
+                </select>
+                <input type="date" id="dateFilter" onchange="filterData()" placeholder="تاريخ">
+                <input type="text" id="searchInput" placeholder="🔍 بحث (الاسم، اللقب)..." onkeyup="filterData()">
             </div>
 
             <div class="card">
@@ -81,8 +86,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>صاحب الشهادة</th>
-                                <th>مقدم الطلب</th>
-                                <th>البريد / الهاتف</th>
+                                <th>مكان الميلاد</th>
                                 <th>النوع</th>
                                 <th>الحالة</th>
                                 <th>التاريخ</th>
@@ -91,13 +95,74 @@
                         </thead>
                         <tbody id="certificatesTable">
                             <tr>
-                                <td colspan="8" class="loading-cell">
+                                <td colspan="7" class="loading-cell">
                                     <div class="loading-spinner"></div>
                                     جاري التحميل...
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>تعديل الطلب</h2>
+                    <button class="close-modal" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" onsubmit="saveCertificate(event)">
+                        <input type="hidden" id="edit_id">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>اللقب</label>
+                                <input type="text" id="edit_owner_lastname" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الاسم</label>
+                                <input type="text" id="edit_owner_firstname" required>
+                            </div>
+                            <div class="form-group">
+                                <label>اسم الأب</label>
+                                <input type="text" id="edit_owner_father">
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ الميلاد</label>
+                                <input type="date" id="edit_owner_birthdate">
+                            </div>
+                            <div class="form-group">
+                                <label>مكان الميلاد</label>
+                                <input type="text" id="edit_owner_birthplace">
+                            </div>
+                            <div class="form-group">
+                                <label>رقم الهاتف</label>
+                                <input type="text" id="edit_phone" dir="ltr">
+                            </div>
+                            <div class="form-group">
+                                <label>البريد الإلكتروني</label>
+                                <input type="email" id="edit_email">
+                            </div>
+                            <div class="form-group">
+                                <label>حالة الطلب</label>
+                                <select id="edit_status">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="approved">تمت الموافقة</option>
+                                    <option value="rejected">مرفوض</option>
+                                    <option value="extracted">تم الاستخراج</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary"
+                                style="flex: 1; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 4px;">حفظ
+                                التعديلات</button>
+                            <button type="button" onclick="closeModal()" class="btn"
+                                style="flex: 1; padding: 10px; background: #e5e7eb; border: none; border-radius: 4px;">إلغاء</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -119,24 +184,40 @@
 
         async function loadCertificates() {
             allCertificates = await FirebaseService.getNegativeCertificates();
+            populateMunicipalities();
             displayCertificates(allCertificates);
+        }
+
+        function populateMunicipalities() {
+            const select = document.getElementById('municipalityFilter');
+            const places = [...new Set(allCertificates.map(c => c.owner_birthplace).filter(Boolean))].sort();
+            select.innerHTML = '<option value="">كل المناطق (مكان الميلاد)</option>' +
+                places.map(p => `<option value="${p}">${p}</option>`).join('');
         }
 
         window.filterData = function () {
             const status = document.getElementById('statusFilter').value;
             const search = document.getElementById('searchInput').value.toLowerCase();
+            const date = document.getElementById('dateFilter').value;
+            const municipality = document.getElementById('municipalityFilter').value;
 
             let filtered = allCertificates;
 
-            if (status) {
-                filtered = filtered.filter(c => c.status === status);
+            if (status) filtered = filtered.filter(c => c.status === status);
+
+            if (date) {
+                filtered = filtered.filter(c => c.created_at && c.created_at.startsWith(date));
+            }
+
+            if (municipality) {
+                filtered = filtered.filter(c => (c.owner_birthplace || '') === municipality);
             }
 
             if (search) {
                 filtered = filtered.filter(c =>
                     (c.owner_lastname || '').toLowerCase().includes(search) ||
                     (c.owner_firstname || '').toLowerCase().includes(search) ||
-                    (c.email || '').toLowerCase().includes(search)
+                    (c.applicant_lastname || '').toLowerCase().includes(search)
                 );
             }
 
@@ -148,31 +229,91 @@
             document.getElementById('totalCount').textContent = certificates.length + ' طلب';
 
             if (certificates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">لا توجد طلبات</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">لا توجد طلبات</td></tr>';
                 return;
             }
 
             tbody.innerHTML = certificates.map((cert, index) => `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><strong>${cert.owner_firstname || ''} ${cert.owner_lastname || ''}</strong><br><small>${cert.owner_father ? 'بن ' + cert.owner_father : ''}</small></td>
-                    <td>${cert.applicant_firstname || '-'} ${cert.applicant_lastname || ''}</td>
-                    <td>${cert.email || '-'}<br><small dir="ltr">${cert.phone || ''}</small></td>
+                    <td>
+                        <strong>${cert.owner_firstname || ''} ${cert.owner_lastname || ''}</strong>
+                        <div style="font-size: 0.85em; color: gray;">${cert.owner_father ? 'بن ' + cert.owner_father : ''}</div>
+                    </td>
+                    <td>${cert.owner_birthplace || '-'}</td>
                     <td>${cert.type || 'جديدة'}</td>
                     <td><span class="status-badge status-${cert.status}">${getStatusLabel(cert.status)}</span></td>
                     <td>${formatDate(cert.created_at)}</td>
                     <td>
-                        <button class="action-btn action-approve" onclick="updateStatus('${cert.id}', 'approved')" title="موافقة">✓</button>
-                        <button class="action-btn action-reject" onclick="updateStatus('${cert.id}', 'rejected')" title="رفض">✗</button>
-                        <button class="action-btn action-extract" onclick="updateStatus('${cert.id}', 'extracted')" title="استخراج">📜</button>
+                        <div class="actions-group">
+                            <button class="action-btn action-edit" onclick="openEditModal('${cert.id}')" title="تعديل">✏️</button>
+                            <button class="action-btn action-delete" onclick="deleteCertificate('${cert.id}')" title="حذف">🗑️</button>
+                            ${cert.status === 'pending' ? `
+                                <button class="action-btn action-approve" onclick="updateStatus('${cert.id}', 'approved')" title="موافقة">✓</button>
+                                <button class="action-btn action-reject" onclick="updateStatus('${cert.id}', 'rejected')" title="رفض">✗</button>
+                            ` : ''}
+                            ${cert.status === 'approved' ? `
+                                <button class="action-btn action-extract" onclick="updateStatus('${cert.id}', 'extracted')" title="استخراج">📜</button>
+                            ` : ''}
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
         window.updateStatus = async function (id, status) {
-            await FirebaseService.updateCertificateStatus(id, status);
+            if (confirm('هل أنت متأكد من تغيير الحالة؟')) {
+                await FirebaseService.updateCertificateStatus(id, status);
+                loadCertificates();
+            }
+        };
+
+        window.deleteCertificate = async function (id) {
+            if (confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟')) {
+                await FirebaseService.deleteCertificate(id);
+                loadCertificates();
+            }
+        };
+
+        window.openEditModal = function (id) {
+            const cert = allCertificates.find(c => c.id === id);
+            if (!cert) return;
+
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_owner_lastname').value = cert.owner_lastname || '';
+            document.getElementById('edit_owner_firstname').value = cert.owner_firstname || '';
+            document.getElementById('edit_owner_father').value = cert.owner_father || '';
+            document.getElementById('edit_owner_birthdate').value = cert.owner_birthdate || '';
+            document.getElementById('edit_owner_birthplace').value = cert.owner_birthplace || '';
+            document.getElementById('edit_phone').value = cert.phone || '';
+            document.getElementById('edit_email').value = cert.email || '';
+            document.getElementById('edit_status').value = cert.status || 'pending';
+
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.saveCertificate = async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_id').value;
+            const data = {
+                owner_lastname: document.getElementById('edit_owner_lastname').value,
+                owner_firstname: document.getElementById('edit_owner_firstname').value,
+                owner_father: document.getElementById('edit_owner_father').value,
+                owner_birthdate: document.getElementById('edit_owner_birthdate').value,
+                owner_birthplace: document.getElementById('edit_owner_birthplace').value,
+                phone: document.getElementById('edit_phone').value,
+                email: document.getElementById('edit_email').value,
+                status: document.getElementById('edit_status').value
+            };
+
+            await FirebaseService.updateCertificate(id, data);
+            document.getElementById('editModal').classList.remove('active');
             loadCertificates();
+        };
+
+        window.closeModal = function (e) {
+            if (e && e.target !== document.getElementById('editModal') && !e.target.classList.contains('close-modal') && !e.target.classList.contains('btn')) return;
+            document.getElementById('editModal').classList.remove('active');
         };
 
         function getStatusLabel(status) {
@@ -208,15 +349,15 @@
             display: flex;
             gap: 16px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .filters-bar select,
         .filters-bar input {
-            padding: 12px 16px;
+            padding: 10px;
             border: 2px solid var(--gray-200);
             border-radius: var(--radius);
             font-family: inherit;
-            font-size: 1rem;
         }
 
         .filters-bar input {
@@ -231,34 +372,138 @@
             font-size: 0.9rem;
         }
 
+        .actions-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .action-edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .action-edit:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        .action-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .action-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
         .action-approve {
-            background: rgba(16, 185, 129, 0.1) !important;
-            color: #059669 !important;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
         }
 
         .action-approve:hover {
-            background: #10b981 !important;
-            color: white !important;
+            background: #10b981;
+            color: white;
         }
 
         .action-reject {
-            background: rgba(239, 68, 68, 0.1) !important;
-            color: #dc2626 !important;
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
         }
 
         .action-reject:hover {
-            background: #ef4444 !important;
-            color: white !important;
+            background: #ef4444;
+            color: white;
         }
 
         .action-extract {
-            background: rgba(59, 130, 246, 0.1) !important;
-            color: #2563eb !important;
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
         }
 
         .action-extract:hover {
-            background: #3b82f6 !important;
-            color: white !important;
+            background: #3b82f6;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </body>

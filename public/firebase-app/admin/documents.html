@@ -45,6 +45,11 @@
                     <option value="approved">تمت الموافقة</option>
                     <option value="rejected">مرفوض</option>
                 </select>
+                <select id="municipalityFilter" onchange="filterData()">
+                    <option value="">كل البلديات</option>
+                    <!-- Populated dynamically -->
+                </select>
+                <input type="date" id="dateFilter" onchange="filterData()" placeholder="تاريخ">
                 <input type="text" id="searchInput" placeholder="🔍 بحث..." onkeyup="filterData()">
             </div>
             <div class="card">
@@ -75,30 +80,187 @@
                 </div>
             </div>
         </div>
+
+        <!-- Edit Modal -->
+        <div id="editModal" class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>تعديل الطلب</h2>
+                    <button class="close-modal" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" onsubmit="saveDocument(event)">
+                        <input type="hidden" id="edit_id">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>لقب مقدم الطلب</label>
+                                <input type="text" id="edit_applicant_lastname" required>
+                            </div>
+                            <div class="form-group">
+                                <label>اسم مقدم الطلب</label>
+                                <input type="text" id="edit_applicant_firstname" required>
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ الميلاد</label>
+                                <input type="date" id="edit_birthdate">
+                            </div>
+                            <div class="form-group">
+                                <label>مكان الميلاد</label>
+                                <input type="text" id="edit_birthplace">
+                            </div>
+                            <div class="form-group">
+                                <label>البلدية</label>
+                                <input type="text" id="edit_municipality">
+                            </div>
+                            <div class="form-group">
+                                <label>العنوان</label>
+                                <input type="text" id="edit_address">
+                            </div>
+                            <div class="form-group">
+                                <label>الهاتف</label>
+                                <input type="text" id="edit_phone" dir="ltr">
+                            </div>
+                            <div class="form-group">
+                                <label>الحالة</label>
+                                <select id="edit_status">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="approved">تمت الموافقة</option>
+                                    <option value="rejected">مرفوض</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary"
+                                style="flex: 1; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 4px;">حفظ
+                                التعديلات</button>
+                            <button type="button" onclick="closeModal()" class="btn"
+                                style="flex: 1; padding: 10px; background: #e5e7eb; border: none; border-radius: 4px;">إلغاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
+
     <script type="module">
-        import { FirebaseService, db } from '../js/firebase-config.js';
-        import { doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { FirebaseService } from '../js/firebase-config.js';
+
         let allDocs = [];
+
         FirebaseService.onAuthChange(u => { if (!u) window.location.href = 'login.html'; else loadDocs(); });
-        async function loadDocs() { allDocs = await FirebaseService.getDocumentRequests(); displayDocs(allDocs); }
+
+        async function loadDocs() {
+            allDocs = await FirebaseService.getDocumentRequests();
+            populateMunicipalities();
+            displayDocs(allDocs);
+        }
+
+        function populateMunicipalities() {
+            const select = document.getElementById('municipalityFilter');
+            const munis = [...new Set(allDocs.map(d => d.municipality).filter(Boolean))].sort();
+            select.innerHTML = '<option value="">كل البلديات</option>' +
+                munis.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+
         window.filterData = function () {
             let f = allDocs;
             const t = document.getElementById('typeFilter').value;
             const s = document.getElementById('statusFilter').value;
+            const m = document.getElementById('municipalityFilter').value;
+            const d = document.getElementById('dateFilter').value;
             const q = document.getElementById('searchInput').value.toLowerCase();
+
             if (t) f = f.filter(d => d.card_type === t || d.request_type === t);
             if (s) f = f.filter(d => d.status === s);
-            if (q) f = f.filter(d => (d.applicant_lastname || '').toLowerCase().includes(q));
+            if (m) f = f.filter(d => d.municipality === m);
+            if (d) f = f.filter(doc => doc.created_at && doc.created_at.startsWith(d));
+
+            if (q) f = f.filter(d =>
+                (d.applicant_lastname || '').toLowerCase().includes(q) ||
+                (d.applicant_firstname || '').toLowerCase().includes(q)
+            );
+
             displayDocs(f);
         };
+
         function displayDocs(docs) {
             const tb = document.getElementById('documentsTable');
             document.getElementById('totalCount').textContent = docs.length + ' طلب';
             if (!docs.length) { tb.innerHTML = '<tr><td colspan="7" class="empty-cell">لا توجد طلبات</td></tr>'; return; }
-            tb.innerHTML = docs.map((d, i) => `<tr><td>${i + 1}</td><td>${d.applicant_firstname || ''} ${d.applicant_lastname || ''}</td><td>${d.card_type_ar || d.request_type_ar || d.card_type || '-'}</td><td>${d.municipality || '-'}</td><td><span class="status-badge status-${d.status}">${{ 'pending': 'انتظار', 'approved': 'موافقة', 'rejected': 'مرفوض' }[d.status] || d.status || '-'}</span></td><td>${d.created_at ? new Date(d.created_at).toLocaleDateString('ar-DZ') : '-'}</td><td><button class="action-btn" onclick="updateS('${d.id}','approved')">✓</button><button class="action-btn" onclick="updateS('${d.id}','rejected')">✗</button></td></tr>`).join('');
+            tb.innerHTML = docs.map((d, i) => `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${d.applicant_firstname || ''} ${d.applicant_lastname || ''}</td>
+                    <td>${d.card_type_ar || d.request_type_ar || d.card_type || '-'}</td>
+                    <td>${d.municipality || '-'}</td>
+                    <td><span class="status-badge status-${d.status}">${{ 'pending': 'انتظار', 'approved': 'موافقة', 'rejected': 'مرفوض' }[d.status] || d.status || '-'}</span></td>
+                    <td>${d.created_at ? new Date(d.created_at).toLocaleDateString('ar-DZ') : '-'}</td>
+                    <td>
+                        <div class="actions-group">
+                            <button class="action-btn action-edit" onclick="openEditModal('${d.id}')" title="تعديل">✏️</button>
+                            <button class="action-btn action-delete" onclick="deleteDocument('${d.id}')" title="حذف">🗑️</button>
+                            <button class="action-btn action-approve" onclick="updateS('${d.id}','approved')" title="موافقة">✓</button>
+                            <button class="action-btn action-reject" onclick="updateS('${d.id}','rejected')" title="رفض">✗</button>
+                        </div>
+                    </td>
+                </tr>`).join('');
         }
-        window.updateS = async function (id, s) { await updateDoc(doc(db, 'documents_requests', id), { status: s, updated_at: new Date().toISOString() }); loadDocs(); };
+
+        window.updateS = async function (id, s) {
+            if (confirm('هل أنت متأكد؟')) {
+                await FirebaseService.updateDocumentRequest(id, { status: s });
+                loadDocs();
+            }
+        };
+
+        window.deleteDocument = async function (id) {
+            if (confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟')) {
+                await FirebaseService.deleteDocumentRequest(id);
+                loadDocs();
+            }
+        };
+
+        window.openEditModal = function (id) {
+            const doc = allDocs.find(d => d.id === id);
+            if (!doc) return;
+
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_applicant_lastname').value = doc.applicant_lastname || '';
+            document.getElementById('edit_applicant_firstname').value = doc.applicant_firstname || '';
+            document.getElementById('edit_birthdate').value = doc.birthdate || '';
+            document.getElementById('edit_birthplace').value = doc.birthplace || '';
+            document.getElementById('edit_municipality').value = doc.municipality || '';
+            document.getElementById('edit_address').value = doc.address || '';
+            document.getElementById('edit_phone').value = doc.phone || '';
+            document.getElementById('edit_status').value = doc.status || 'pending';
+
+            document.getElementById('editModal').classList.add('active');
+        };
+
+        window.saveDocument = async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_id').value;
+            const data = {
+                applicant_lastname: document.getElementById('edit_applicant_lastname').value,
+                applicant_firstname: document.getElementById('edit_applicant_firstname').value,
+                birthdate: document.getElementById('edit_birthdate').value,
+                birthplace: document.getElementById('edit_birthplace').value,
+                municipality: document.getElementById('edit_municipality').value,
+                address: document.getElementById('edit_address').value,
+                phone: document.getElementById('edit_phone').value,
+                status: document.getElementById('edit_status').value
+            };
+
+            await FirebaseService.updateDocumentRequest(id, data);
+            document.getElementById('editModal').classList.remove('active');
+            loadDocs();
+        };
+
+        window.closeModal = function (e) {
+            if (e && e.target !== document.getElementById('editModal') && !e.target.classList.contains('close-modal') && !e.target.classList.contains('btn')) return;
+            document.getElementById('editModal').classList.remove('active');
+        };
+
         window.handleLogout = async function () { await FirebaseService.logout(); window.location.href = 'login.html'; };
     </script>
     <script>function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }</script>
@@ -112,7 +274,7 @@
 
         .filters-bar select,
         .filters-bar input {
-            padding: 12px 16px;
+            padding: 10px;
             border: 2px solid var(--gray-200);
             border-radius: var(--radius);
             font-family: inherit
@@ -128,6 +290,130 @@
             padding: 6px 16px;
             border-radius: 50px;
             font-size: .9rem
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .action-edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .action-edit:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        .action-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .action-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .action-approve {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .action-approve:hover {
+            background: #10b981;
+            color: white;
+        }
+
+        .action-reject {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .action-reject:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </body>
