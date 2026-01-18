@@ -1,112 +1,88 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طباعة البطاقة العقارية</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap');
+
         body {
             font-family: 'Tajawal', Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background: white;
-            color: #333;
-            line-height: 1.6;
+            padding: 0;
+            background: #e5e7eb;
         }
-        
-        .card {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            border: 3px solid #059669;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #059669;
-            padding-bottom: 20px;
-        }
-        
-        .logo {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-        
-        .title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #059669;
-            margin: 10px 0;
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 20px;
-        }
-        
-        .content {
-            margin: 30px 0;
-            font-size: 1.1rem;
-        }
-        
-        .section {
-            margin: 30px 0;
-            padding: 20px;
-            background: #f0fdf4;
-            border-radius: 8px;
-            border-right: 4px solid #059669;
-        }
-        
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #059669;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #059669;
-            padding-bottom: 5px;
-        }
-        
-        .field {
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .field strong {
-            color: #059669;
-            min-width: 150px;
-        }
-        
-        .footer {
-            margin-top: 50px;
-            text-align: center;
-            border-top: 2px solid #059669;
-            padding-top: 20px;
-        }
-        
-        .date {
-            margin-top: 30px;
-            text-align: left;
-        }
-        
+
+        /* Print styles */
         @media print {
-            body { margin: 0; padding: 0; }
-            .card { box-shadow: none; border: 2px solid #000; }
-            .no-print { display: none; }
+            body {
+                background: white;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .canvas-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                border: none !important;
+                page-break-after: always;
+            }
         }
-        
+
+        /* Container for pages */
+        #pages-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Replicating Editor CSS */
+        .canvas-page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: auto;
+        }
+
+        .draggable-element {
+            position: absolute;
+            box-sizing: border-box;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .draggable-element .text-content {
+            width: 100%;
+            height: 100%;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        /* Loading & Error */
+        .message-box {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
         .print-btn {
             position: fixed;
             top: 20px;
             right: 20px;
             background: #059669;
+            /* Green for Documents */
             color: white;
             border: none;
             padding: 10px 20px;
@@ -114,176 +90,118 @@
             cursor: pointer;
             font-family: inherit;
             font-size: 1rem;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
+
+        .print-btn:hover {
+            background: #047857;
         }
     </style>
 </head>
+
 <body>
+
     <button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>
-    
-    <div id="loading" class="loading">
-        <div>جاري تحميل بيانات البطاقة...</div>
+
+    <div id="loading" class="message-box">
+        <div>جاري تحميل البيانات والقالب...</div>
     </div>
-    
-    <div id="card" class="card" style="display: none;">
-        <div class="header">
-            <div class="logo">🏠</div>
-            <h1 class="title">الجمهورية الجزائرية الديمقراطية الشعبية</h1>
-            <h2 class="subtitle">المحافظة العقارية</h2>
-            <h3 class="subtitle">البطاقة العقارية</h3>
-        </div>
-        
-        <div class="content">
-            <div class="section">
-                <div class="section-title">بيانات مقدم الطلب</div>
-                <div class="field">
-                    <strong>اللقب:</strong>
-                    <span id="applicant_lastname">-</span>
-                </div>
-                <div class="field">
-                    <strong>الاسم:</strong>
-                    <span id="applicant_firstname">-</span>
-                </div>
-                <div class="field">
-                    <strong>الهاتف:</strong>
-                    <span id="applicant_phone">-</span>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-title">بيانات صاحب الملكية</div>
-                <div class="field">
-                    <strong>اللقب:</strong>
-                    <span id="owner_lastname">-</span>
-                </div>
-                <div class="field">
-                    <strong>الاسم:</strong>
-                    <span id="owner_firstname">-</span>
-                </div>
-                <div class="field">
-                    <strong>اسم الأب:</strong>
-                    <span id="owner_father">-</span>
-                </div>
-                <div class="field">
-                    <strong>تاريخ الميلاد:</strong>
-                    <span id="owner_birthdate">-</span>
-                </div>
-                <div class="field">
-                    <strong>مكان الميلاد:</strong>
-                    <span id="owner_birthplace">-</span>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-title">بيانات العقار</div>
-                <div class="field">
-                    <strong>نوع البطاقة:</strong>
-                    <span id="card_type">-</span>
-                </div>
-                <div class="field">
-                    <strong>البلدية:</strong>
-                    <span id="municipality">-</span>
-                </div>
-                <div class="field">
-                    <strong>القسم:</strong>
-                    <span id="section">-</span>
-                </div>
-                <div class="field">
-                    <strong>رقم المخطط:</strong>
-                    <span id="plan_number">-</span>
-                </div>
-                <div class="field">
-                    <strong>رقم القطعة:</strong>
-                    <span id="parcel_number">-</span>
-                </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-title">معلومات الطلب</div>
-                <div class="field">
-                    <strong>رقم الطلب:</strong>
-                    <span id="request_id">-</span>
-                </div>
-                <div class="field">
-                    <strong>حالة العقار:</strong>
-                    <span id="property_status">-</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p><strong>هذه البطاقة صالحة لمدة ستة أشهر من تاريخ الإصدار</strong></p>
-            <div class="date">
-                <strong>التاريخ:</strong> <span id="issue_date"></span>
-            </div>
-        </div>
-    </div>
+
+    <div id="pages-container"></div>
 
     <script type="module">
         import { FirebaseService } from '../js/firebase-config.js';
-        
-        // الحصول على ID من URL
+
         const urlParams = new URLSearchParams(window.location.search);
         const documentId = urlParams.get('id');
-        
-        if (!documentId) {
-            document.getElementById('loading').innerHTML = '<div style="color: red;">معرف البطاقة مفقود</div>';
-        } else {
-            loadDocument();
-        }
-        
-        async function loadDocument() {
+
+        async function init() {
+            if (!documentId) {
+                showError('معرف البطاقة مفقود');
+                return;
+            }
+
             try {
+                // 1. Fetch Document Data
                 const documents = await FirebaseService.getDocumentRequests();
-                const document = documents.find(d => d.id === documentId);
-                
-                if (!document) {
-                    document.getElementById('loading').innerHTML = '<div style="color: red;">البطاقة غير موجودة</div>';
+                const docData = documents.find(d => d.id === documentId);
+
+                if (!docData) {
+                    showError('البطاقة غير موجودة');
                     return;
                 }
-                
-                // التحقق من الحالة
-                if (document.status !== 'approved') {
-                    document.getElementById('loading').innerHTML = '<div style="color: red;">لا يمكن طباعة بطاقة غير معتمدة</div>';
+
+                if (docData.status !== 'approved') {
+                    showError('لا يمكن طباعة بطاقة غير معتمدة');
                     return;
                 }
-                
-                // تعبئة البيانات
-                document.getElementById('applicant_lastname').textContent = document.applicant_lastname || '-';
-                document.getElementById('applicant_firstname').textContent = document.applicant_firstname || '-';
-                document.getElementById('applicant_phone').textContent = document.applicant_phone || '-';
-                
-                document.getElementById('owner_lastname').textContent = document.owner_lastname || '-';
-                document.getElementById('owner_firstname').textContent = document.owner_firstname || '-';
-                document.getElementById('owner_father').textContent = document.owner_father || '-';
-                document.getElementById('owner_birthdate').textContent = document.owner_birthdate || '-';
-                document.getElementById('owner_birthplace').textContent = document.owner_birthplace || '-';
-                
-                document.getElementById('card_type').textContent = getCardTypeLabel(document.card_type) || '-';
-                document.getElementById('municipality').textContent = document.municipality || '-';
-                document.getElementById('section').textContent = document.section || '-';
-                document.getElementById('plan_number').textContent = document.plan_number || '-';
-                document.getElementById('parcel_number').textContent = document.parcel_number || '-';
-                
-                document.getElementById('request_id').textContent = document.id || '-';
-                document.getElementById('property_status').textContent = getPropertyStatusLabel(document.property_status) || '-';
-                document.getElementById('issue_date').textContent = new Date().toLocaleDateString('ar-DZ');
-                
-                // إظهار البطاقة
+
+                // 2. Fetch Template
+                let templateState = null;
+                const localTemplate = localStorage.getItem('templateEditor_advanced');
+
+                if (localTemplate) {
+                    try {
+                        templateState = JSON.parse(localTemplate);
+                    } catch (e) {
+                        console.error('Error parsing local template', e);
+                    }
+                }
+
+                if (!templateState || !templateState.pages || templateState.pages.length === 0) {
+                    showError('لم يتم العثور على قالب محفوظ. الرجاء تصميم وحفظ قالب في محرر القوالب أولاً.');
+                    return;
+                }
+
+                // 3. Render
+                renderTemplate(templateState, docData);
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('card').style.display = 'block';
-                
+
             } catch (error) {
-                console.error('Error loading document:', error);
-                document.getElementById('loading').innerHTML = '<div style="color: red;">حدث خطأ في تحميل البطاقة</div>';
+                console.error(error);
+                showError('حدث خطأ أثناء المعالجة: ' + error.message);
             }
         }
-        
+
+        function showError(msg) {
+            const el = document.getElementById('loading');
+            el.innerHTML = `<div style="color: red;">${msg}</div>`;
+        }
+
+        function renderTemplate(state, data) {
+            const container = document.getElementById('pages-container');
+            container.innerHTML = '';
+
+            state.pages.forEach(pageState => {
+                const pageEl = document.createElement('div');
+                pageEl.className = 'canvas-page';
+
+                pageState.elements.forEach(elData => {
+                    const el = document.createElement('div');
+                    el.className = 'draggable-element';
+
+                    el.style.left = (elData.x || 0) + 'px';
+                    el.style.top = (elData.y || 0) + 'px';
+
+                    if (elData.style) {
+                        el.style.width = elData.style.width;
+                        el.style.height = elData.style.height;
+                    }
+
+                    if (elData.html) {
+                        let contentHtml = elData.html;
+                        contentHtml = replaceVariables(contentHtml, data);
+                        el.innerHTML = contentHtml;
+                    }
+
+                    pageEl.appendChild(el);
+                });
+
+                container.appendChild(pageEl);
+            });
+        }
+
         function getCardTypeLabel(type) {
             const labels = {
                 'personal': 'البطاقة الشخصية',
@@ -294,7 +212,7 @@
             };
             return labels[type] || type;
         }
-        
+
         function getPropertyStatusLabel(status) {
             const labels = {
                 'surveyed': 'مسحي',
@@ -303,6 +221,45 @@
             };
             return labels[status] || status;
         }
+
+        function replaceVariables(html, data) {
+            const vars = {
+                '{{applicant_lastname}}': data.applicant_lastname || '',
+                '{{applicant_firstname}}': data.applicant_firstname || '',
+                '{{applicant_phone}}': data.applicant_phone || '',
+                '{{owner_lastname}}': data.owner_lastname || '',
+                '{{owner_firstname}}': data.owner_firstname || '',
+                '{{owner_father}}': data.owner_father || '',
+                '{{owner_birthdate}}': data.owner_birthdate || '',
+                '{{owner_birthplace}}': data.owner_birthplace || '',
+                '{{card_type}}': getCardTypeLabel(data.card_type) || '',
+                '{{municipality}}': data.municipality || '',
+                '{{section}}': data.section || '',
+                '{{plan_number}}': data.plan_number || '',
+                '{{parcel_number}}': data.parcel_number || '',
+                '{{request_id}}': data.id || '',
+                '{{property_status}}': getPropertyStatusLabel(data.property_status) || '',
+                '{{issue_date}}': new Date().toLocaleDateString('ar-DZ'),
+
+                // Arabic placeholders (matching template-editor.js updates)
+                '{{اللقب}}': data.owner_lastname || '',  // For owner
+                '{{الاسم}}': data.owner_firstname || '',  // For owner
+                '{{تاريخ_الميلاد}}': data.owner_birthdate || '',
+                '{{مكان_الميلاد}}': data.owner_birthplace || '',
+                '{{رقم_السند}}': data.plan_number || '', // Mapping plan_number to Sanad for now, or just placeholder
+                '{{الموقع}}': data.municipality || '',
+                '{{المساحة}}': '' // Area might not be in the basic request data, leaving empty or need to check data structure
+            };
+
+            let text = html;
+            for (const [key, val] of Object.entries(vars)) {
+                text = text.replace(new RegExp(key, 'g'), val);
+            }
+            return text;
+        }
+
+        init();
     </script>
 </body>
+
 </html>

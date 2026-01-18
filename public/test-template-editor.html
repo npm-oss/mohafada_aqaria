@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,26 +8,27 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@600;700&display=swap"
+    rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <link rel="stylesheet" href="css/template-editor.css">
-  
+
   <style>
     body {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    
+
     .workspace {
       flex: 1;
       min-height: 400px;
     }
-    
+
     .loading-message {
       text-align: center;
       padding: 40px;
@@ -34,7 +36,7 @@
       font-size: 18px;
       color: #666;
     }
-    
+
     .test-info {
       background: #fffbea;
       border: 2px solid #f59e0b;
@@ -90,18 +92,18 @@
     window.TEMPLATE_TYPE = 'negative-certificate';
     window.TEMPLATE_NAME = 'شهادة سلبية';
     window.CSRF_TOKEN = 'test-token';
-    
+
     console.log('Template Type:', window.TEMPLATE_TYPE);
     console.log('Interact.js loaded:', typeof interact !== 'undefined');
-    
+
     // تعطيل وظائف السيرفر للاختبار
-    window.saveToServer = async function() {
-      alert('✅ تم الحفظ محلياً (وضع الاختبار)');
+    window.saveToServer = async function () {
+      showModal('✅ تم الحفظ محلياً (وضع الاختبار)', 'success');
       const state = captureState();
       localStorage.setItem('test-template', JSON.stringify(state));
     };
-    
-    window.loadFromServer = async function() {
+
+    window.loadFromServer = async function () {
       const saved = localStorage.getItem('test-template');
       if (saved) {
         try {
@@ -112,14 +114,16 @@
         }
       }
     };
-    
-    window.restoreDefault = async function() {
+
+    window.restoreDefault = async function () {
       if (!confirm('هل تريد استعادة القالب الافتراضي؟')) return;
       localStorage.removeItem('test-template');
       location.reload();
     };
   </script>
-  
+
+  <script src="js/custom-modal.js"></script>
   <script src="js/template-editor.js"></script>
 </body>
+
 </html>

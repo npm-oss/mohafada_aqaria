@@ -14,6 +14,7 @@
 <body class="admin-body">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
+        <script src="../../js/custom-modal.js"></script>
         <div class="sidebar-header">
             <span class="logo-icon">🏛️</span>
             <span class="logo-text">المحافظة العقارية</span>
@@ -279,13 +280,13 @@
                             'Content-Type': 'application/json'
                         }
                     });
-                    
+
                     if (response.ok) {
                         // تحديث Firebase أيضاً
                         await FirebaseService.updateCertificateStatus(id, status);
                         loadCertificates();
                     } else {
-                        alert('حدث خطأ في تحديث الحالة');
+                        showModal('حدث خطأ في تحديث الحالة', 'error');
                     }
                 } catch (error) {
                     console.error('Error updating status:', error);
@@ -296,7 +297,7 @@
             }
         };
 
-        window.printCertificate = function(id) {
+        window.printCertificate = function (id) {
             window.open(`print-certificate.html?id=${id}`, '_blank');
         };
 
@@ -307,10 +308,10 @@
                     if (result.success) {
                         loadCertificates();
                     } else {
-                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                        showModal('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'), 'error');
                     }
                 } catch (e) {
-                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    showModal('خطأ برمجي أثناء الحذف: ' + e.message, 'error');
                     console.error(e);
                 }
             }
@@ -336,7 +337,7 @@
 
                 document.getElementById('editModal').classList.add('active');
             } catch (e) {
-                alert('حدث خطأ في فتح نافذة التعديل: ' + e.message);
+                showModal('حدث خطأ في فتح نافذة التعديل: ' + e.message, 'error');
                 console.error(e);
             }
         };
@@ -361,10 +362,10 @@
                     document.getElementById('editModal').classList.remove('active');
                     loadCertificates();
                 } else {
-                    alert('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'));
+                    showModal('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'), 'error');
                 }
             } catch (e) {
-                alert('خطأ برمجي أثناء الحفظ: ' + e.message);
+                showModal('خطأ برمجي أثناء الحفظ: ' + e.message, 'error');
                 console.error(e);
             }
         };

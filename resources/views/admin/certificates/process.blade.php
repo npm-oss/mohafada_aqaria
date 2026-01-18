@@ -79,6 +79,8 @@
 
 </div>
 
+
+<script src="{{ asset('js/custom-modal.js') }}"></script>
 <script>
 function copyToClipboard() {
     let text = `
@@ -93,7 +95,7 @@ function copyToClipboard() {
 الولاية: ${document.querySelector('select[name="state"]').value}
 البلدية: ${document.querySelector('input[name="municipality"]').value}
 `;
-    navigator.clipboard.writeText(text).then(() => { alert('تم نسخ المعلومات إلى الحافظة'); });
+    navigator.clipboard.writeText(text).then(() => { showModal('تم نسخ المعلومات إلى الحافظة', 'success'); });
 }
 </script>
 @endsection

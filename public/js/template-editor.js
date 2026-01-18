@@ -21,17 +21,17 @@ function createPage(pageNumber) {
   const page = document.createElement('div');
   page.className = 'page';
   page.dataset.pageNumber = pageNumber;
-  
+
   const pageNum = document.createElement('div');
   pageNum.className = 'page-number';
   pageNum.textContent = `صفحة ${pageNumber}`;
   page.appendChild(pageNum);
-  
+
   // محتوى افتراضي بناءً على نوع القالب
   const content = document.createElement('div');
   content.className = 'movable';
   content.dataset.id = `page-${pageNumber}-content`;
-  
+
   // تحديد المحتوى بناءً على نوع القالب
   if (window.TEMPLATE_TYPE === 'negative-certificate') {
     content.innerHTML = `
@@ -44,11 +44,11 @@ function createPage(pageNumber) {
       </div>
       <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 10mm; line-height: 2;">
         <p>نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:</p>
-        <p style="margin-top: 8mm;">اللقب: <span class="fill"></span></p>
-        <p>الاسم: <span class="fill"></span></p>
-        <p>اسم الأب: <span class="fill"></span></p>
-        <p>تاريخ الميلاد: <span class="fill"></span></p>
-        <p>مكان الميلاد: <span class="fill"></span></p>
+        <p style="margin-top: 8mm;">اللقب: {{اللقب}}</p>
+        <p>الاسم: {{الاسم}}</p>
+        <p>اسم الأب: {{اسم_الاب}}</p>
+        <p>تاريخ الميلاد: {{تاريخ_الميلاد}}</p>
+        <p>مكان الميلاد: {{مكان_الميلاد}}</p>
       </div>
       <div class="movable" data-id="signature-${pageNumber}" data-editable="1" style="margin-top: 20mm; text-align: left;">
         <p>المحافظ العقاري</p>
@@ -66,15 +66,15 @@ function createPage(pageNumber) {
       </div>
       <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 10mm; line-height: 2;">
         <h3 style="font-weight: bold; margin-bottom: 5mm;">بيانات مقدم الطلب:</h3>
-        <p>اللقب: <span class="fill"></span></p>
-        <p>الاسم: <span class="fill"></span></p>
-        <p>تاريخ الميلاد: <span class="fill"></span></p>
-        <p>مكان الميلاد: <span class="fill"></span></p>
+        <p>اللقب: {{اللقب}}</p>
+        <p>الاسم: {{الاسم}}</p>
+        <p>تاريخ الميلاد: {{تاريخ_الميلاد}}</p>
+        <p>مكان الميلاد: {{مكان_الميلاد}}</p>
         
         <h3 style="font-weight: bold; margin: 8mm 0 5mm;">بيانات العقار:</h3>
-        <p>رقم السند: <span class="fill"></span></p>
-        <p>الموقع: <span class="fill"></span></p>
-        <p>المساحة: <span class="fill"></span></p>
+        <p>رقم السند: {{رقم_السند}}</p>
+        <p>الموقع: {{الموقع}}</p>
+        <p>المساحة: {{المساحة}}</p>
       </div>
     `;
   } else {
@@ -90,7 +90,7 @@ function createPage(pageNumber) {
       </div>
     `;
   }
-  
+
   page.appendChild(content);
   return page;
 }
@@ -106,10 +106,10 @@ function addPage() {
 
 function removePage() {
   if (pages.length <= 1) {
-    alert('يجب أن يحتوي القالب على صفحة واحدة على الأقل');
+    showModal('يجب أن يحتوي القالب على صفحة واحدة على الأقل', 'warning');
     return;
   }
-  
+
   if (confirm(`هل تريد حذف الصفحة ${pages.length}؟`)) {
     const lastPage = pages.pop();
     workspace.removeChild(lastPage);
@@ -151,7 +151,7 @@ function selectEl(el) {
 // ======= interact.js: سحب + تغيير حجم =======
 function enableInteractForPage(page) {
   const movables = page.querySelectorAll('.movable');
-  
+
   movables.forEach(el => {
     interact(el)
       .draggable({
@@ -183,7 +183,7 @@ function enableInteractForPage(page) {
             const { width, height } = event.rect;
             target.style.width = width + 'px';
             target.style.height = height + 'px';
-            
+
             const pos = getXY(target);
             const x = pos.x + event.deltaRect.left;
             const y = pos.y + event.deltaRect.top;
@@ -196,7 +196,7 @@ function enableInteractForPage(page) {
           })
         ]
       });
-    
+
     el.addEventListener('pointerdown', (e) => {
       if (!editMode) return;
       e.stopPropagation();
@@ -207,7 +207,7 @@ function enableInteractForPage(page) {
 
 function enableInteract() {
   pages.forEach(page => enableInteractForPage(page));
-  
+
   workspace.addEventListener('pointerdown', () => {
     if (!editMode) return;
     clearSelection();
@@ -224,7 +224,7 @@ function setEditable(on) {
 function setEditMode(on) {
   editMode = on;
   document.body.classList.toggle('edit-on', on);
-  
+
   btnSave.disabled = !on;
   btnReset.disabled = !on;
   btnAddPage.disabled = !on;
@@ -232,10 +232,10 @@ function setEditMode(on) {
   btnExportJson.disabled = !on;
   btnImportJson.disabled = !on;
   btnPreview.disabled = !on;
-  
+
   btnEdit.textContent = on ? 'إيقاف وضع التعديل' : 'تفعيل وضع التعديل';
   setEditable(on);
-  
+
   if (!on) {
     clearSelection();
   }
@@ -248,17 +248,17 @@ function captureState() {
     templateType: window.TEMPLATE_TYPE,
     pages: []
   };
-  
+
   pages.forEach((page, pageIndex) => {
     const pageState = {
       pageNumber: pageIndex + 1,
       elements: []
     };
-    
+
     page.querySelectorAll('[data-id]').forEach(el => {
       const id = el.getAttribute('data-id');
       const { x, y } = getXY(el);
-      
+
       const item = {
         id,
         x, y,
@@ -268,54 +268,54 @@ function captureState() {
         },
         html: (el.getAttribute('data-editable') === '1') ? el.innerHTML : null
       };
-      
+
       pageState.elements.push(item);
     });
-    
+
     state.pages.push(pageState);
   });
-  
+
   return state;
 }
 
 function applyState(state) {
   if (!state || !state.pages) return;
-  
+
   // حذف الصفحات الحالية
   while (pages.length > 0) {
     const page = pages.pop();
     workspace.removeChild(page);
   }
-  
+
   // إنشاء الصفحات من الحالة
   state.pages.forEach((pageState, index) => {
     addPage();
     const page = pages[index];
-    
+
     pageState.elements.forEach(item => {
       const el = page.querySelector(`[data-id="${CSS.escape(item.id)}"]`);
       if (!el) return;
-      
+
       setTranslate(el, item.x || 0, item.y || 0);
-      
+
       if (item.style) {
         el.style.width = item.style.width || '';
         el.style.height = item.style.height || '';
       }
-      
+
       if (item.html != null && el.getAttribute('data-editable') === '1') {
         el.innerHTML = item.html;
       }
     });
   });
-  
+
   updatePageIndicator();
 }
 
 // ======= حفظ على السيرفر =======
 async function saveToServer() {
   const state = captureState();
-  
+
   try {
     const response = await fetch(`/admin/templates/save-settings`, {
       method: 'POST',
@@ -328,17 +328,17 @@ async function saveToServer() {
         settings: JSON.stringify(state)
       })
     });
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
-      alert('✅ ' + result.message);
+      showModal('✅ ' + result.message, 'success');
     } else {
-      alert('❌ فشل الحفظ: ' + result.message);
+      showModal('❌ فشل الحفظ: ' + result.message, 'error');
     }
   } catch (error) {
     console.error(error);
-    alert('❌ حدث خطأ أثناء الحفظ');
+    showModal('❌ حدث خطأ أثناء الحفظ', 'error');
   }
 }
 
@@ -347,7 +347,7 @@ async function loadFromServer() {
   try {
     const response = await fetch(`/admin/templates/load-settings/${window.TEMPLATE_TYPE}`);
     const result = await response.json();
-    
+
     if (result.success && result.settings) {
       applyState(result.settings);
       console.log('✅ تم تحميل القالب المحفوظ');
@@ -362,7 +362,7 @@ async function restoreDefault() {
   if (!confirm('هل تريد استعادة القالب الافتراضي؟ سيتم حذف جميع التعديلات.')) {
     return;
   }
-  
+
   try {
     const response = await fetch(`/admin/templates/restore/${window.TEMPLATE_TYPE}`, {
       method: 'POST',
@@ -371,18 +371,18 @@ async function restoreDefault() {
         'X-CSRF-TOKEN': window.CSRF_TOKEN
       }
     });
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
-      alert('✅ ' + result.message);
+      showModal('✅ ' + result.message, 'success');
       location.reload();
     } else {
-      alert('❌ ' + result.message);
+      showModal('❌ ' + result.message, 'error');
     }
   } catch (error) {
     console.error(error);
-    alert('❌ حدث خطأ');
+    showModal('❌ حدث خطأ', 'error');
   }
 }
 
@@ -411,15 +411,15 @@ btnImportJson.addEventListener('click', () => fileImport.click());
 fileImport.addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
-  
+
   try {
     const text = await file.text();
     const state = JSON.parse(text);
     applyState(state);
-    alert('✅ تم الاستيراد بنجاح');
+    showModal('✅ تم الاستيراد بنجاح', 'success');
   } catch (err) {
     console.error(err);
-    alert('❌ فشل الاستيراد');
+    showModal('❌ فشل الاستيراد', 'error');
   } finally {
     fileImport.value = '';
   }
@@ -432,15 +432,15 @@ btnPreview.addEventListener('click', () => {
 // ======= تحريك بالأسهم =======
 window.addEventListener('keydown', (e) => {
   if (!editMode || !selectedEl) return;
-  
+
   const step = e.shiftKey ? 10 : 1;
   let { x, y } = getXY(selectedEl);
-  
+
   if (e.key === 'ArrowLeft') { x -= step; e.preventDefault(); }
   if (e.key === 'ArrowRight') { x += step; e.preventDefault(); }
   if (e.key === 'ArrowUp') { y -= step; e.preventDefault(); }
   if (e.key === 'ArrowDown') { y += step; e.preventDefault(); }
-  
+
   setTranslate(selectedEl, x, y);
 });
 
@@ -448,20 +448,20 @@ window.addEventListener('keydown', (e) => {
 function init() {
   try {
     console.log('بدء تهيئة المحرر...');
-    
+
     // إزالة رسالة التحميل
     const loadingMsg = workspace.querySelector('.loading-message');
     if (loadingMsg) {
       loadingMsg.remove();
     }
-    
+
     // إنشاء صفحة واحدة افتراضياً
     addPage();
     enableInteract();
     setEditMode(false);
-    
+
     console.log('تم تهيئة المحرر بنجاح');
-    
+
     // تحميل القالب المحفوظ
     loadFromServer();
   } catch (error) {

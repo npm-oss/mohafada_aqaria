@@ -12,6 +12,7 @@
 
 <body class="admin-body">
     <aside class="sidebar" id="sidebar">
+        <script src="../../js/custom-modal.js"></script>
         <div class="sidebar-header"><span class="logo-icon">🏛️</span><span class="logo-text">المحافظة العقارية</span>
         </div>
         <nav class="sidebar-nav">
@@ -121,7 +122,7 @@
                 displayMessages(allMessages);
             } catch (e) {
                 console.error(e);
-                alert("حدث خطأ أثناء تحميل الرسائل: " + e.message);
+                showModal("حدث خطأ أثناء تحميل الرسائل: " + e.message, 'error');
             }
         }
 
@@ -200,7 +201,7 @@
                 `;
                 document.getElementById('modalOverlay').classList.add('active');
             } catch (e) {
-                alert("خطأ في فتح الرسالة: " + e.message);
+                showModal("خطأ في فتح الرسالة: " + e.message, 'error');
             }
         };
 
@@ -235,10 +236,10 @@
                     document.getElementById('editMessageModal').classList.remove('active');
                     loadMessages();
                 } else {
-                    alert("خطأ في حفظ التعديلات: " + (result.error || 'غير معروف'));
+                    showModal("خطأ في حفظ التعديلات: " + (result.error || 'غير معروف'), 'error');
                 }
             } catch (err) {
-                alert("خطأ في حفظ التعديلات: " + err.message);
+                showModal("خطأ في حفظ التعديلات: " + err.message, 'error');
                 console.error(err);
             }
         };
@@ -260,10 +261,10 @@
                     if (result.success) {
                         loadMessages();
                     } else {
-                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                        showModal('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'), 'error');
                     }
                 } catch (e) {
-                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    showModal('خطأ برمجي أثناء الحذف: ' + e.message, 'error');
                     console.error(e);
                 }
             }

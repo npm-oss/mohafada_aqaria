@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محرر القوالب المتقدم - المحافظة العقارية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Interact.js للسحب والإفلات وتغيير الحجم -->
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-    
+
     <!-- HTML2Canvas و jsPDF للتصدير -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    
+    <script src="public/js/custom-modal.js"></script>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -54,7 +58,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .toolbar-group {
@@ -243,7 +247,7 @@
             width: var(--page-width);
             min-height: var(--page-height);
             background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             position: relative;
             border-radius: 8px;
             overflow: hidden;
@@ -351,7 +355,7 @@
             bottom: 0;
             pointer-events: none;
             opacity: 0.1;
-            background-image: 
+            background-image:
                 linear-gradient(to right, #000 1px, transparent 1px),
                 linear-gradient(to bottom, #000 1px, transparent 1px);
             background-size: 20px 20px;
@@ -368,7 +372,7 @@
             background: white;
             border: 1px solid var(--gray-300);
             border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             padding: 5px 0;
             z-index: 1000;
             display: none;
@@ -396,11 +400,11 @@
             .sidebar-tools {
                 width: 250px;
             }
-            
+
             .canvas-area {
                 padding: 15px;
             }
-            
+
             .canvas-page {
                 transform: scale(0.8);
                 transform-origin: top center;
@@ -411,18 +415,18 @@
             .editor-workspace {
                 flex-direction: column;
             }
-            
+
             .sidebar-tools {
                 width: 100%;
                 height: 200px;
                 order: 2;
             }
-            
+
             .canvas-area {
                 order: 1;
                 height: calc(100vh - 280px);
             }
-            
+
             .canvas-page {
                 transform: scale(0.6);
             }
@@ -430,25 +434,26 @@
 
         /* إخفاء شريط الأدوات عند الطباعة */
         @media print {
+
             .top-toolbar,
             .sidebar-tools {
                 display: none !important;
             }
-            
+
             .canvas-area {
                 padding: 0;
                 background: white;
             }
-            
+
             .canvas-page {
                 box-shadow: none;
                 border-radius: 0;
             }
-            
+
             .draggable-element {
                 border: none !important;
             }
-            
+
             .element-controls {
                 display: none !important;
             }
@@ -465,7 +470,7 @@
             <button class="toolbar-btn" id="undoBtn" disabled>↶ تراجع</button>
             <button class="toolbar-btn" id="redoBtn" disabled>↷ إعادة</button>
         </div>
-        
+
         <div class="toolbar-group">
             <select id="templateSelect" class="property-input" style="width: auto;">
                 <option value="">اختر قالب...</option>
@@ -474,7 +479,7 @@
                 <option value="national-form">نموذج إدارة الأملاك</option>
             </select>
         </div>
-        
+
         <div class="toolbar-group">
             <button class="toolbar-btn success" id="saveBtn">💾 حفظ</button>
             <button class="toolbar-btn" id="loadBtn">📂 تحميل</button>
@@ -523,12 +528,12 @@
             <!-- لوحة خصائص العنصر المحدد -->
             <div class="properties-panel" id="propertiesPanel">
                 <h3>خصائص العنصر</h3>
-                
+
                 <!-- خصائص النص -->
                 <div class="property-group" id="textProperties">
                     <label class="property-label">النص:</label>
                     <textarea class="property-input" id="textContent" rows="3"></textarea>
-                    
+
                     <label class="property-label">الخط:</label>
                     <select class="property-input" id="fontFamily">
                         <option value="Tajawal">Tajawal</option>
@@ -537,7 +542,7 @@
                         <option value="Arial">Arial</option>
                         <option value="Times New Roman">Times New Roman</option>
                     </select>
-                    
+
                     <div class="font-controls">
                         <div>
                             <label class="property-label">الحجم:</label>
@@ -553,13 +558,13 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <label class="property-label">لون النص:</label>
                     <div class="color-picker-group">
                         <input type="color" class="color-picker" id="textColor" value="#000000">
                         <input type="text" class="property-input" id="textColorHex" value="#000000" style="flex: 1;">
                     </div>
-                    
+
                     <label class="property-label">محاذاة النص:</label>
                     <select class="property-input" id="textAlign">
                         <option value="right">يمين</option>
@@ -574,18 +579,19 @@
                     <label class="property-label">لون الخلفية:</label>
                     <div class="color-picker-group">
                         <input type="color" class="color-picker" id="backgroundColor" value="#ffffff">
-                        <input type="text" class="property-input" id="backgroundColorHex" value="#ffffff" style="flex: 1;">
+                        <input type="text" class="property-input" id="backgroundColorHex" value="#ffffff"
+                            style="flex: 1;">
                     </div>
-                    
+
                     <label class="property-label">لون الحدود:</label>
                     <div class="color-picker-group">
                         <input type="color" class="color-picker" id="borderColor" value="#000000">
                         <input type="text" class="property-input" id="borderColorHex" value="#000000" style="flex: 1;">
                     </div>
-                    
+
                     <label class="property-label">سمك الحدود:</label>
                     <input type="number" class="property-input" id="borderWidth" min="0" max="10" value="1">
-                    
+
                     <label class="property-label">نوع الحدود:</label>
                     <select class="property-input" id="borderStyle">
                         <option value="solid">مصمت</option>
@@ -607,7 +613,7 @@
                             <input type="number" class="property-input" id="positionY" value="0">
                         </div>
                     </div>
-                    
+
                     <div class="font-controls">
                         <div>
                             <label class="property-label">العرض:</label>
@@ -618,10 +624,10 @@
                             <input type="number" class="property-input" id="elementHeight" min="10" value="50">
                         </div>
                     </div>
-                    
+
                     <label class="property-label">الدوران (درجة):</label>
                     <input type="number" class="property-input" id="rotation" min="-360" max="360" value="0">
-                    
+
                     <label class="property-label">الشفافية:</label>
                     <input type="range" class="property-input" id="opacity" min="0" max="1" step="0.1" value="1">
                 </div>
@@ -686,7 +692,7 @@
             document.body.classList.toggle('edit-mode', editMode);
             editModeBtn.textContent = editMode ? '🔒 إيقاف التعديل' : '🎨 وضع التعديل';
             editModeBtn.classList.toggle('primary', editMode);
-            
+
             if (!editMode) {
                 clearSelection();
             }
@@ -702,10 +708,10 @@
         document.querySelectorAll('.tool-item').forEach(tool => {
             tool.addEventListener('click', () => {
                 if (!editMode) {
-                    alert('يجب تفعيل وضع التعديل أولاً');
+                    showModal('يجب تفعيل وضع التعديل أولاً', 'info');
                     return;
                 }
-                
+
                 const toolType = tool.dataset.tool;
                 addElement(toolType);
             });
@@ -725,7 +731,7 @@
             element.className = 'draggable-element';
             element.dataset.type = type;
             element.dataset.id = `element_${++elementCounter}`;
-            
+
             // إضافة أدوات التحكم
             const controls = document.createElement('div');
             controls.className = 'element-controls';
@@ -800,7 +806,7 @@
                     listeners: {
                         move(event) {
                             if (!editMode) return;
-                            
+
                             const target = event.target;
                             const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
                             const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
@@ -818,7 +824,7 @@
                     listeners: {
                         move(event) {
                             if (!editMode) return;
-                            
+
                             const target = event.target;
                             let x = (parseFloat(target.getAttribute('data-x')) || 0);
                             let y = (parseFloat(target.getAttribute('data-y')) || 0);
@@ -1068,7 +1074,7 @@
                 const action = e.target.dataset.action;
                 const targetId = contextMenu.dataset.targetId;
                 const element = document.querySelector(`[data-id="${targetId}"]`);
-                
+
                 switch (action) {
                     case 'copy':
                         copyElement(element);
@@ -1089,7 +1095,7 @@
                         element.style.zIndex = (parseInt(element.style.zIndex) || 0) - 1;
                         break;
                 }
-                
+
                 hideContextMenu();
             });
         });
@@ -1101,24 +1107,24 @@
 
         function pasteElement() {
             if (!clipboard) return;
-            
+
             const newElement = clipboard.cloneNode(true);
             newElement.dataset.id = `element_${++elementCounter}`;
-            
+
             // إزاحة بسيطة
             const x = (parseFloat(clipboard.getAttribute('data-x')) || 0) + 20;
             const y = (parseFloat(clipboard.getAttribute('data-y')) || 0) + 20;
             newElement.style.transform = `translate(${x}px, ${y}px)`;
             newElement.setAttribute('data-x', x);
             newElement.setAttribute('data-y', y);
-            
+
             canvasPage.appendChild(newElement);
             makeElementInteractive(newElement);
             selectElement(newElement);
             saveState();
         }
 
-        window.duplicateElement = function(elementId) {
+        window.duplicateElement = function (elementId) {
             const element = document.querySelector(`[data-id="${elementId}"]`);
             if (element) {
                 copyElement(element);
@@ -1126,7 +1132,7 @@
             }
         }
 
-        window.deleteElement = function(elementId) {
+        window.deleteElement = function (elementId) {
             const element = document.querySelector(`[data-id="${elementId}"]`);
             if (element) {
                 element.remove();
@@ -1147,20 +1153,20 @@
                     y: el.getAttribute('data-y')
                 }))
             };
-            
+
             undoStack.push(JSON.stringify(state));
             if (undoStack.length > 50) undoStack.shift();
             redoStack = [];
-            
+
             updateUndoRedoButtons();
         }
 
         function loadState(stateString) {
             const state = JSON.parse(stateString);
-            
+
             // مسح العناصر الحالية
             canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
-            
+
             // إضافة العناصر المحفوظة
             state.elements.forEach(elementData => {
                 const element = document.createElement('div');
@@ -1171,11 +1177,11 @@
                 element.style.cssText = elementData.style;
                 element.setAttribute('data-x', elementData.x);
                 element.setAttribute('data-y', elementData.y);
-                
+
                 canvasPage.appendChild(element);
                 makeElementInteractive(element);
             });
-            
+
             clearSelection();
         }
 
@@ -1197,18 +1203,18 @@
                     y: el.getAttribute('data-y')
                 }))
             };
-            
+
             localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
-            alert('تم حفظ القالب بنجاح!');
+            showModal('تم حفظ القالب بنجاح!', 'success');
         });
 
         loadBtn.addEventListener('click', () => {
             const saved = localStorage.getItem('templateEditor_advanced');
             if (saved) {
                 loadState(saved);
-                alert('تم تحميل القالب بنجاح!');
+                showModal('تم تحميل القالب بنجاح!', 'success');
             } else {
-                alert('لا يوجد قالب محفوظ!');
+                showModal('لا يوجد قالب محفوظ!', 'warning');
             }
         });
 
@@ -1224,7 +1230,7 @@
                     y: el.getAttribute('data-y')
                 }))
             };
-            
+
             const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1245,9 +1251,9 @@
                 reader.onload = (e) => {
                     try {
                         loadState(e.target.result);
-                        alert('تم استيراد القالب بنجاح!');
+                        showModal('تم استيراد القالب بنجاح!', 'success');
                     } catch (error) {
-                        alert('خطأ في استيراد الملف!');
+                        showModal('خطأ في استيراد الملف!', 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -1259,14 +1265,14 @@
                 scale: 2,
                 backgroundColor: '#ffffff'
             });
-            
+
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            
+
             const imgData = canvas.toDataURL('image/png');
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
+
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
             pdf.save('template-design.pdf');
         });
@@ -1305,10 +1311,10 @@
         // تحميل القوالب الجاهزة
         function loadTemplate(templateType) {
             currentTemplate = templateType;
-            
+
             // مسح العناصر الحالية
             canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
-            
+
             switch (templateType) {
                 case 'certificate':
                     loadCertificateTemplate();
@@ -1320,7 +1326,7 @@
                     loadNationalFormTemplate();
                     break;
             }
-            
+
             saveState();
         }
 
@@ -1361,7 +1367,7 @@
             element.className = 'draggable-element';
             element.dataset.type = type;
             element.dataset.id = `element_${++elementCounter}`;
-            
+
             // إضافة أدوات التحكم
             const controls = document.createElement('div');
             controls.className = 'element-controls';
@@ -1376,13 +1382,13 @@
             textElement.className = 'text-element';
             textElement.contentEditable = true;
             textElement.textContent = text;
-            
+
             if (type === 'title') {
                 textElement.style.fontSize = '20px';
                 textElement.style.fontWeight = 'bold';
                 textElement.style.textAlign = 'center';
             }
-            
+
             element.appendChild(textElement);
 
             // تحديد الموضع والحجم
@@ -1406,7 +1412,7 @@
         function initEditor() {
             setupPropertyListeners();
             updateUndoRedoButtons();
-            
+
             // تحميل آخر حالة محفوظة
             const saved = localStorage.getItem('templateEditor_advanced');
             if (saved) {
@@ -1427,4 +1433,5 @@
         initEditor();
     </script>
 </body>
+
 </html>

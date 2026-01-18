@@ -12,6 +12,7 @@
     <!-- HTML2Canvas & jsPDF -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="/js/custom-modal.js"></script>
     
     <style>
         :root {
@@ -1099,12 +1100,12 @@
                 
                 const data = await response.json();
                 if (data.success) {
-                    alert('تم الحفظ بنجاح!');
+                    showModal('تم الحفظ بنجاح!', 'success');
                 } else {
-                    alert('خطأ في الحفظ: ' + (data.message || 'Unknown error'));
+                    showModal('خطأ في الحفظ: ' + (data.message || 'Unknown error'), 'error');
                 }
             } catch (e) {
-                alert('خطأ في الاتصال');
+                showModal('خطأ في الاتصال', 'error');
                 console.error(e);
             } finally {
                 btn.innerHTML = originalText;

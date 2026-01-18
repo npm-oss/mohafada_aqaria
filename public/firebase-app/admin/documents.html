@@ -12,6 +12,7 @@
 
 <body class="admin-body">
     <aside class="sidebar" id="sidebar">
+        <script src="../../js/custom-modal.js"></script>
         <div class="sidebar-header"><span class="logo-icon">🏛️</span><span class="logo-text">المحافظة العقارية</span>
         </div>
         <nav class="sidebar-nav">
@@ -21,7 +22,8 @@
             <a href="documents.html" class="nav-item active"><span class="nav-icon">📄</span><span>طلبات
                     الوثائق</span></a>
             <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span><span>الرسائل</span></a>
-            <a href="template-editor.html" class="nav-item"><span class="nav-icon">🎨</span><span>محرر القوالب</span></a>
+            <a href="template-editor.html" class="nav-item"><span class="nav-icon">🎨</span><span>محرر
+                    القوالب</span></a>
         </nav>
         <div class="sidebar-footer"><button class="logout-btn"
                 onclick="handleLogout()"><span>🚪</span><span>خروج</span></button></div>
@@ -222,7 +224,7 @@
                             'Content-Type': 'application/json'
                         }
                     });
-                    
+
                     if (response.ok) {
                         // تحديث Firebase أيضاً
                         await FirebaseService.updateDocumentRequest(id, { status: s });
@@ -240,7 +242,7 @@
             }
         };
 
-        window.printDocument = function(id) {
+        window.printDocument = function (id) {
             window.open(`print-document.html?id=${id}`, '_blank');
         };
 
@@ -251,10 +253,10 @@
                     if (result.success) {
                         loadDocs();
                     } else {
-                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                        showModal('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'), 'error');
                     }
                 } catch (e) {
-                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    showModal('خطأ برمجي أثناء الحذف: ' + e.message, 'error');
                     console.error(e);
                 }
             }
@@ -280,7 +282,7 @@
 
                 document.getElementById('editModal').classList.add('active');
             } catch (e) {
-                alert('حدث خطأ أثناء فتح النافذة: ' + e.message);
+                showModal('حدث خطأ أثناء فتح النافذة: ' + e.message, 'error');
                 console.error(e);
             }
         };
@@ -305,10 +307,10 @@
                     document.getElementById('editModal').classList.remove('active');
                     loadDocs();
                 } else {
-                    alert('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'));
+                    showModal('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'), 'error');
                 }
             } catch (e) {
-                alert('خطأ برمجي أثناء الحفظ: ' + e.message);
+                showModal('خطأ برمجي أثناء الحفظ: ' + e.message, 'error');
                 console.error(e);
             }
         };

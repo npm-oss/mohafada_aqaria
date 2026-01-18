@@ -15,6 +15,7 @@
     <!-- HTML2Canvas و jsPDF للتصدير -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="../../js/custom-modal.js"></script>
 
     <style>
         :root {
@@ -707,7 +708,7 @@
         document.querySelectorAll('.tool-item').forEach(tool => {
             tool.addEventListener('click', () => {
                 if (!editMode) {
-                    alert('يجب تفعيل وضع التعديل أولاً');
+                    showModal('يجب تفعيل وضع التعديل أولاً', 'info');
                     return;
                 }
 
@@ -1204,16 +1205,16 @@
             };
 
             localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
-            alert('تم حفظ القالب بنجاح!');
+            showModal('تم حفظ القالب بنجاح!', 'success');
         });
 
         loadBtn.addEventListener('click', () => {
             const saved = localStorage.getItem('templateEditor_advanced');
             if (saved) {
                 loadState(saved);
-                alert('تم تحميل القالب بنجاح!');
+                showModal('تم تحميل القالب بنجاح!', 'success');
             } else {
-                alert('لا يوجد قالب محفوظ!');
+                showModal('لا يوجد قالب محفوظ!', 'warning');
             }
         });
 
@@ -1250,9 +1251,9 @@
                 reader.onload = (e) => {
                     try {
                         loadState(e.target.result);
-                        alert('تم استيراد القالب بنجاح!');
+                        showModal('تم استيراد القالب بنجاح!', 'success');
                     } catch (error) {
-                        alert('خطأ في استيراد الملف!');
+                        showModal('خطأ في استيراد الملف!', 'error');
                     }
                 };
                 reader.readAsText(file);

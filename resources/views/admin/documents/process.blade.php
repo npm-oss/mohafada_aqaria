@@ -86,6 +86,7 @@
     </div>
 </div>
 
+<script src="{{ asset('js/custom-modal.js') }}"></script>
 <script>
 const radios = document.querySelectorAll('input[name="property_status"]');
 const surveyedFields = document.getElementById('surveyed_fields');
@@ -140,7 +141,7 @@ document.getElementById('searchBtn').addEventListener('click', function () {
 
     // التأكد من وجود نوع البطاقة
     if(!card_type.value){
-        alert("اختر نوع البطاقة أولاً");
+        showModal("اختر نوع البطاقة أولاً", "warning");
         return;
     }
 
@@ -166,7 +167,7 @@ document.getElementById('searchBtn').addEventListener('click', function () {
     .then(data => {
 
         if(!data.success){
-            alert("البطاقة غير موجودة");
+            showModal("البطاقة غير موجودة", "error");
             resultSection.classList.add("hidden");
             return;
         }
