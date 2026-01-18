@@ -142,6 +142,42 @@ Route::prefix('admin')
         Route::post('/templates/restore/{type}', [App\Http\Controllers\Admin\TemplateEditorController::class, 'restore'])
             ->name('templates.restore');
 
+        // API routes for Firebase admin (JSON responses)
+        Route::post('/certificates/{id}/approve', function($id) {
+            $certificate = \App\Models\NegativeCertificate::findOrFail($id);
+            $certificate->status = 'approved';
+            $certificate->save();
+            return response()->json(['success' => true, 'message' => 'تم قبول الطلب']);
+        })->name('api.certificates.approve');
+        
+        Route::post('/certificates/{id}/reject', function($id) {
+            $certificate = \App\Models\NegativeCertificate::findOrFail($id);
+            $certificate->status = 'rejected';
+            $certificate->save();
+            return response()->json(['success' => true, 'message' => 'تم رفض الطلب']);
+        })->name('api.certificates.reject');
+        
+        Route::post('/certificates/{id}/extract', function($id) {
+            $certificate = \App\Models\NegativeCertificate::findOrFail($id);
+            $certificate->status = 'extracted';
+            $certificate->save();
+            return response()->json(['success' => true, 'message' => 'تم استخراج الشهادة']);
+        })->name('api.certificates.extract');
+
+        Route::post('/documents/{id}/approve', function($id) {
+            $document = \App\Models\DocumentsRequest::findOrFail($id);
+            $document->status = 'approved';
+            $document->save();
+            return response()->json(['success' => true, 'message' => 'تم قبول الطلب']);
+        })->name('api.documents.approve');
+        
+        Route::post('/documents/{id}/reject', function($id) {
+            $document = \App\Models\DocumentsRequest::findOrFail($id);
+            $document->status = 'rejected';
+            $document->save();
+            return response()->json(['success' => true, 'message' => 'تم رفض الطلب']);
+        })->name('api.documents.reject');
+
         // مسارات الطباعة
         Route::get('/certificates/{id}/print', [App\Http\Controllers\Admin\PrintController::class, 'printNegativeCertificate'])
             ->name('certificates.print');

@@ -21,6 +21,7 @@
             <a href="documents.html" class="nav-item active"><span class="nav-icon">📄</span><span>طلبات
                     الوثائق</span></a>
             <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span><span>الرسائل</span></a>
+            <a href="/admin/templates/editor" class="nav-item" target="_blank"><span class="nav-icon">🎨</span><span>محرر القوالب</span></a>
         </nav>
         <div class="sidebar-footer"><button class="logout-btn"
                 onclick="handleLogout()"><span>🚪</span><span>خروج</span></button></div>
@@ -199,8 +200,13 @@
                         <div class="actions-group">
                             <button class="action-btn action-edit" onclick="openEditModal('${d.id}')" title="تعديل">✏️</button>
                             <button class="action-btn action-delete" onclick="deleteDocument('${d.id}')" title="حذف">🗑️</button>
-                            <button class="action-btn action-approve" onclick="updateS('${d.id}','approved')" title="موافقة">✓</button>
-                            <button class="action-btn action-reject" onclick="updateS('${d.id}','rejected')" title="رفض">✗</button>
+                            ${d.status === 'pending' ? `
+                                <button class="action-btn action-approve" onclick="updateS('${d.id}','approved')" title="موافقة">✓</button>
+                                <button class="action-btn action-reject" onclick="updateS('${d.id}','rejected')" title="رفض">✗</button>
+                            ` : ''}
+                            ${d.status === 'approved' ? `
+                                <button class="action-btn action-print" onclick="printDocument('${d.id}')" title="طباعة">🖨️</button>
+                            ` : ''}
                         </div>
                     </td>
                 </tr>`).join('');
@@ -208,9 +214,34 @@
 
         window.updateS = async function (id, s) {
             if (confirm('هل أنت متأكد؟')) {
-                await FirebaseService.updateDocumentRequest(id, { status: s });
-                loadDocs();
+                try {
+                    // استخدام Laravel API
+                    const response = await fetch(`/admin/documents/${id}/${s}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // تحديث Firebase أيضاً
+                        await FirebaseService.updateDocumentRequest(id, { status: s });
+                    } else {
+                        // fallback إلى Firebase فقط
+                        await FirebaseService.updateDocumentRequest(id, { status: s });
+                    }
+                    loadDocs();
+                } catch (error) {
+                    console.error('Error updating status:', error);
+                    // fallback إلى Firebase
+                    await FirebaseService.updateDocumentRequest(id, { status: s });
+                    loadDocs();
+                }
             }
+        };
+
+        window.printDocument = function(id) {
+            window.open(`/admin/documents/${id}/print`, '_blank');
         };
 
         window.deleteDocument = async function (id) {
@@ -373,6 +404,16 @@
 
         .action-reject:hover {
             background: #ef4444;
+            color: white;
+        }
+
+        .action-print {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8b4513;
+        }
+
+        .action-print:hover {
+            background: #8b4513;
             color: white;
         }
 

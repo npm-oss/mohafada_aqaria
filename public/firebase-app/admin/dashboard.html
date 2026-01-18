@@ -39,6 +39,10 @@
                 <span>الرسائل</span>
                 <span class="badge" id="msgBadge">0</span>
             </a>
+            <a href="/admin/templates/editor" class="nav-item" target="_blank">
+                <span class="nav-icon">🎨</span>
+                <span>محرر القوالب</span>
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -294,11 +298,34 @@
         };
 
         window.updateStatus = async function (collection, id, status) {
-            if (collection === 'negative_certificates') {
-                await FirebaseService.updateCertificateStatus(id, status);
+            try {
+                if (collection === 'negative_certificates') {
+                    // استخدام Laravel API
+                    const response = await fetch(`/admin/certificates/${id}/${status}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // تحديث Firebase أيضاً
+                        await FirebaseService.updateCertificateStatus(id, status);
+                    } else {
+                        // fallback إلى Firebase فقط
+                        await FirebaseService.updateCertificateStatus(id, status);
+                    }
+                }
+                // Reload data
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error updating status:', error);
+                // fallback إلى Firebase
+                if (collection === 'negative_certificates') {
+                    await FirebaseService.updateCertificateStatus(id, status);
+                }
+                loadDashboardData();
             }
-            // Reload data
-            loadDashboardData();
         };
     </script>
     <script>

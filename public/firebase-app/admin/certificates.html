@@ -36,6 +36,10 @@
                 <span class="nav-icon">💬</span>
                 <span>الرسائل</span>
             </a>
+            <a href="/admin/templates/editor" class="nav-item" target="_blank">
+                <span class="nav-icon">🎨</span>
+                <span>محرر القوالب</span>
+            </a>
         </nav>
 
         <div class="sidebar-footer">
@@ -254,6 +258,10 @@
                             ` : ''}
                             ${cert.status === 'approved' ? `
                                 <button class="action-btn action-extract" onclick="updateStatus('${cert.id}', 'extracted')" title="استخراج">📜</button>
+                                <button class="action-btn action-print" onclick="printCertificate('${cert.id}')" title="طباعة">🖨️</button>
+                            ` : ''}
+                            ${cert.status === 'extracted' ? `
+                                <button class="action-btn action-print" onclick="printCertificate('${cert.id}')" title="طباعة">🖨️</button>
                             ` : ''}
                         </div>
                     </td>
@@ -263,9 +271,33 @@
 
         window.updateStatus = async function (id, status) {
             if (confirm('هل أنت متأكد من تغيير الحالة؟')) {
-                await FirebaseService.updateCertificateStatus(id, status);
-                loadCertificates();
+                try {
+                    // استخدام Laravel API
+                    const response = await fetch(`/admin/certificates/${id}/${status}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // تحديث Firebase أيضاً
+                        await FirebaseService.updateCertificateStatus(id, status);
+                        loadCertificates();
+                    } else {
+                        alert('حدث خطأ في تحديث الحالة');
+                    }
+                } catch (error) {
+                    console.error('Error updating status:', error);
+                    // fallback إلى Firebase فقط
+                    await FirebaseService.updateCertificateStatus(id, status);
+                    loadCertificates();
+                }
             }
+        };
+
+        window.printCertificate = function(id) {
+            window.open(`/admin/certificates/${id}/print`, '_blank');
         };
 
         window.deleteCertificate = async function (id) {
@@ -463,6 +495,16 @@
 
         .action-extract:hover {
             background: #3b82f6;
+            color: white;
+        }
+
+        .action-print {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8b4513;
+        }
+
+        .action-print:hover {
+            background: #8b4513;
             color: white;
         }
 
