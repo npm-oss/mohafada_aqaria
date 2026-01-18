@@ -329,18 +329,90 @@
 
 /* Action Button */
 .action-btn {
-    background: var(--gray-100);
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-sm);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    /* Softer rounded corners */
     cursor: pointer;
     font-size: 1.1rem;
-    transition: var(--transition);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Specific button colors (overriding inline styles if present, or adding specific classes) */
+.action-btn.action-view {
+    color: var(--primary);
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.action-btn.action-view:hover {
     background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.action-btn.action-edit {
+    color: #d97706;
+    /* Amber 600 */
+    background: rgba(245, 158, 11, 0.05);
+    /* Amber 50 */
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.action-btn.action-edit:hover {
+    background: #d97706;
+    color: white;
+    border-color: #d97706;
+}
+
+.action-btn.action-delete {
+    color: #dc2626;
+    /* Red 600 */
+    background: rgba(239, 68, 68, 0.05);
+    /* Red 50 */
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.action-btn.action-delete:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+.action-btn.action-approve {
+    color: #059669;
+    /* Emerald 600 */
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.action-btn.action-approve:hover {
+    background: #059669;
+    color: white;
+    border-color: #059669;
+}
+
+.action-btn.action-reject {
+    color: #dc2626;
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.action-btn.action-reject:hover {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
 }
 
 /* Messages List */

@@ -153,6 +153,53 @@ const FirebaseService = {
         }
     },
 
+    async updateContactReadStatus(id, status) {
+        try {
+            const updates = {};
+            updates[`/${NODES.CONTACTS}/${id}/read`] = status;
+            await update(ref(db), updates);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async updateContact(id, data) {
+        try {
+            const updates = {};
+            updates[`/${NODES.CONTACTS}/${id}`] = {
+                ...data,
+                updated_at: new Date().toISOString()
+            }; // Note: This replaces the node, ensure data includes all fields or use specific paths if needed. 
+            // Better approach to merge:
+            const existingRef = child(ref(db), `${NODES.CONTACTS}/${id}`);
+            const snapshot = await get(existingRef);
+            if (snapshot.exists()) {
+                const existingData = snapshot.val();
+                updates[`/${NODES.CONTACTS}/${id}`] = { ...existingData, ...data };
+            } else {
+                updates[`/${NODES.CONTACTS}/${id}`] = data;
+            }
+
+            await update(ref(db), updates);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteContact(id) {
+        try {
+            await set(ref(db, `${NODES.CONTACTS}/${id}`), null);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
     // Authentication
     async login(email, password) {
         try {
