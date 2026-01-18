@@ -36,7 +36,7 @@
                 <span class="nav-icon">💬</span>
                 <span>الرسائل</span>
             </a>
-            <a href="/admin/templates/editor" class="nav-item" target="_blank">
+            <a href="template-editor.html" class="nav-item">
                 <span class="nav-icon">🎨</span>
                 <span>محرر القوالب</span>
             </a>
@@ -297,7 +297,7 @@
         };
 
         window.printCertificate = function(id) {
-            window.open(`/admin/certificates/${id}/print`, '_blank');
+            window.open(`print-certificate.html?id=${id}`, '_blank');
         };
 
         window.deleteCertificate = async function (id) {

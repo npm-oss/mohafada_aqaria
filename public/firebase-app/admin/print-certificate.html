@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة الشهادة السلبية</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .certificate {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            border: 3px solid #2563eb;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #2563eb;
+            margin: 10px 0;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            margin: 30px 0;
+            font-size: 1.1rem;
+        }
+        
+        .field {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-right: 4px solid #2563eb;
+        }
+        
+        .field strong {
+            color: #2563eb;
+            margin-left: 10px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            border-top: 2px solid #2563eb;
+            padding-top: 20px;
+        }
+        
+        .date {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        @media print {
+            body { margin: 0; padding: 0; }
+            .certificate { box-shadow: none; border: 2px solid #000; }
+            .no-print { display: none; }
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>
+    
+    <div id="loading" class="loading">
+        <div>جاري تحميل بيانات الشهادة...</div>
+    </div>
+    
+    <div id="certificate" class="certificate" style="display: none;">
+        <div class="header">
+            <div class="logo">🏛️</div>
+            <h1 class="title">الجمهورية الجزائرية الديمقراطية الشعبية</h1>
+            <h2 class="subtitle">المحافظة العقارية</h2>
+            <h3 class="subtitle">شهادة سلبية</h3>
+        </div>
+        
+        <div class="content">
+            <p style="text-align: center; font-size: 1.3rem; margin-bottom: 30px;">
+                <strong>نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:</strong>
+            </p>
+            
+            <div class="field">
+                <strong>اللقب:</strong>
+                <span id="owner_lastname">-</span>
+            </div>
+            
+            <div class="field">
+                <strong>الاسم:</strong>
+                <span id="owner_firstname">-</span>
+            </div>
+            
+            <div class="field">
+                <strong>اسم الأب:</strong>
+                <span id="owner_father">-</span>
+            </div>
+            
+            <div class="field">
+                <strong>تاريخ الميلاد:</strong>
+                <span id="owner_birthdate">-</span>
+            </div>
+            
+            <div class="field">
+                <strong>مكان الميلاد:</strong>
+                <span id="owner_birthplace">-</span>
+            </div>
+            
+            <div class="field">
+                <strong>رقم الطلب:</strong>
+                <span id="request_id">-</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>هذه الشهادة صالحة لمدة ثلاثة أشهر من تاريخ الإصدار</strong></p>
+            <div class="date">
+                <strong>التاريخ:</strong> <span id="issue_date"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+        
+        // الحصول على ID من URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const certificateId = urlParams.get('id');
+        
+        if (!certificateId) {
+            document.getElementById('loading').innerHTML = '<div style="color: red;">معرف الشهادة مفقود</div>';
+        } else {
+            loadCertificate();
+        }
+        
+        async function loadCertificate() {
+            try {
+                const certificates = await FirebaseService.getNegativeCertificates();
+                const certificate = certificates.find(c => c.id === certificateId);
+                
+                if (!certificate) {
+                    document.getElementById('loading').innerHTML = '<div style="color: red;">الشهادة غير موجودة</div>';
+                    return;
+                }
+                
+                // التحقق من الحالة
+                if (certificate.status !== 'approved' && certificate.status !== 'extracted') {
+                    document.getElementById('loading').innerHTML = '<div style="color: red;">لا يمكن طباعة شهادة غير معتمدة</div>';
+                    return;
+                }
+                
+                // تعبئة البيانات
+                document.getElementById('owner_lastname').textContent = certificate.owner_lastname || '-';
+                document.getElementById('owner_firstname').textContent = certificate.owner_firstname || '-';
+                document.getElementById('owner_father').textContent = certificate.owner_father || '-';
+                document.getElementById('owner_birthdate').textContent = certificate.owner_birthdate || '-';
+                document.getElementById('owner_birthplace').textContent = certificate.owner_birthplace || '-';
+                document.getElementById('request_id').textContent = certificate.id || '-';
+                document.getElementById('issue_date').textContent = new Date().toLocaleDateString('ar-DZ');
+                
+                // إظهار الشهادة
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('certificate').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+                document.getElementById('loading').innerHTML = '<div style="color: red;">حدث خطأ في تحميل الشهادة</div>';
+            }
+        }
+    </script>
+</body>
+</html>

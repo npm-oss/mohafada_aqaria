@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طباعة البطاقة العقارية</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+        
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .card {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            border: 3px solid #059669;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #059669;
+            padding-bottom: 20px;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #059669;
+            margin: 10px 0;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .content {
+            margin: 30px 0;
+            font-size: 1.1rem;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            border-right: 4px solid #059669;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #059669;
+            padding-bottom: 5px;
+        }
+        
+        .field {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .field strong {
+            color: #059669;
+            min-width: 150px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            border-top: 2px solid #059669;
+            padding-top: 20px;
+        }
+        
+        .date {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        @media print {
+            body { margin: 0; padding: 0; }
+            .card { box-shadow: none; border: 2px solid #000; }
+            .no-print { display: none; }
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn no-print" onclick="window.print()">🖨️ طباعة</button>
+    
+    <div id="loading" class="loading">
+        <div>جاري تحميل بيانات البطاقة...</div>
+    </div>
+    
+    <div id="card" class="card" style="display: none;">
+        <div class="header">
+            <div class="logo">🏠</div>
+            <h1 class="title">الجمهورية الجزائرية الديمقراطية الشعبية</h1>
+            <h2 class="subtitle">المحافظة العقارية</h2>
+            <h3 class="subtitle">البطاقة العقارية</h3>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-title">بيانات مقدم الطلب</div>
+                <div class="field">
+                    <strong>اللقب:</strong>
+                    <span id="applicant_lastname">-</span>
+                </div>
+                <div class="field">
+                    <strong>الاسم:</strong>
+                    <span id="applicant_firstname">-</span>
+                </div>
+                <div class="field">
+                    <strong>الهاتف:</strong>
+                    <span id="applicant_phone">-</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">بيانات صاحب الملكية</div>
+                <div class="field">
+                    <strong>اللقب:</strong>
+                    <span id="owner_lastname">-</span>
+                </div>
+                <div class="field">
+                    <strong>الاسم:</strong>
+                    <span id="owner_firstname">-</span>
+                </div>
+                <div class="field">
+                    <strong>اسم الأب:</strong>
+                    <span id="owner_father">-</span>
+                </div>
+                <div class="field">
+                    <strong>تاريخ الميلاد:</strong>
+                    <span id="owner_birthdate">-</span>
+                </div>
+                <div class="field">
+                    <strong>مكان الميلاد:</strong>
+                    <span id="owner_birthplace">-</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">بيانات العقار</div>
+                <div class="field">
+                    <strong>نوع البطاقة:</strong>
+                    <span id="card_type">-</span>
+                </div>
+                <div class="field">
+                    <strong>البلدية:</strong>
+                    <span id="municipality">-</span>
+                </div>
+                <div class="field">
+                    <strong>القسم:</strong>
+                    <span id="section">-</span>
+                </div>
+                <div class="field">
+                    <strong>رقم المخطط:</strong>
+                    <span id="plan_number">-</span>
+                </div>
+                <div class="field">
+                    <strong>رقم القطعة:</strong>
+                    <span id="parcel_number">-</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">معلومات الطلب</div>
+                <div class="field">
+                    <strong>رقم الطلب:</strong>
+                    <span id="request_id">-</span>
+                </div>
+                <div class="field">
+                    <strong>حالة العقار:</strong>
+                    <span id="property_status">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>هذه البطاقة صالحة لمدة ستة أشهر من تاريخ الإصدار</strong></p>
+            <div class="date">
+                <strong>التاريخ:</strong> <span id="issue_date"></span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+        
+        // الحصول على ID من URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const documentId = urlParams.get('id');
+        
+        if (!documentId) {
+            document.getElementById('loading').innerHTML = '<div style="color: red;">معرف البطاقة مفقود</div>';
+        } else {
+            loadDocument();
+        }
+        
+        async function loadDocument() {
+            try {
+                const documents = await FirebaseService.getDocumentRequests();
+                const document = documents.find(d => d.id === documentId);
+                
+                if (!document) {
+                    document.getElementById('loading').innerHTML = '<div style="color: red;">البطاقة غير موجودة</div>';
+                    return;
+                }
+                
+                // التحقق من الحالة
+                if (document.status !== 'approved') {
+                    document.getElementById('loading').innerHTML = '<div style="color: red;">لا يمكن طباعة بطاقة غير معتمدة</div>';
+                    return;
+                }
+                
+                // تعبئة البيانات
+                document.getElementById('applicant_lastname').textContent = document.applicant_lastname || '-';
+                document.getElementById('applicant_firstname').textContent = document.applicant_firstname || '-';
+                document.getElementById('applicant_phone').textContent = document.applicant_phone || '-';
+                
+                document.getElementById('owner_lastname').textContent = document.owner_lastname || '-';
+                document.getElementById('owner_firstname').textContent = document.owner_firstname || '-';
+                document.getElementById('owner_father').textContent = document.owner_father || '-';
+                document.getElementById('owner_birthdate').textContent = document.owner_birthdate || '-';
+                document.getElementById('owner_birthplace').textContent = document.owner_birthplace || '-';
+                
+                document.getElementById('card_type').textContent = getCardTypeLabel(document.card_type) || '-';
+                document.getElementById('municipality').textContent = document.municipality || '-';
+                document.getElementById('section').textContent = document.section || '-';
+                document.getElementById('plan_number').textContent = document.plan_number || '-';
+                document.getElementById('parcel_number').textContent = document.parcel_number || '-';
+                
+                document.getElementById('request_id').textContent = document.id || '-';
+                document.getElementById('property_status').textContent = getPropertyStatusLabel(document.property_status) || '-';
+                document.getElementById('issue_date').textContent = new Date().toLocaleDateString('ar-DZ');
+                
+                // إظهار البطاقة
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('card').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading document:', error);
+                document.getElementById('loading').innerHTML = '<div style="color: red;">حدث خطأ في تحميل البطاقة</div>';
+            }
+        }
+        
+        function getCardTypeLabel(type) {
+            const labels = {
+                'personal': 'البطاقة الشخصية',
+                'alphabetical': 'البطاقة الأبجدية',
+                'urban': 'البطاقة الحضرية',
+                'rural': 'البطاقة الريفية',
+                'contract': 'مستخرج عقد'
+            };
+            return labels[type] || type;
+        }
+        
+        function getPropertyStatusLabel(status) {
+            const labels = {
+                'surveyed': 'مسحي',
+                'non_surveyed': 'غير مسحي',
+                'rural': 'ريفي'
+            };
+            return labels[status] || status;
+        }
+    </script>
+</body>
+</html>

@@ -21,7 +21,7 @@
             <a href="documents.html" class="nav-item active"><span class="nav-icon">📄</span><span>طلبات
                     الوثائق</span></a>
             <a href="messages.html" class="nav-item"><span class="nav-icon">💬</span><span>الرسائل</span></a>
-            <a href="/admin/templates/editor" class="nav-item" target="_blank"><span class="nav-icon">🎨</span><span>محرر القوالب</span></a>
+            <a href="template-editor.html" class="nav-item"><span class="nav-icon">🎨</span><span>محرر القوالب</span></a>
         </nav>
         <div class="sidebar-footer"><button class="logout-btn"
                 onclick="handleLogout()"><span>🚪</span><span>خروج</span></button></div>
@@ -241,7 +241,7 @@
         };
 
         window.printDocument = function(id) {
-            window.open(`/admin/documents/${id}/print`, '_blank');
+            window.open(`print-document.html?id=${id}`, '_blank');
         };
 
         window.deleteDocument = async function (id) {

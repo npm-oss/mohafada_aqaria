@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر القوالب - المحافظة العقارية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <style>
+        .template-editor {
+            display: flex;
+            height: calc(100vh - 80px);
+            gap: 20px;
+        }
+        
+        .templates-list {
+            width: 300px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .template-item {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .template-item:hover {
+            border-color: #2563eb;
+            background: #f8fafc;
+        }
+        
+        .template-item.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        
+        .template-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .template-name {
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+        
+        .template-desc {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .editor-panel {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .editor-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #047857;
+        }
+        
+        .editor-content {
+            height: calc(100% - 100px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .editor-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .editor-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .editor-tab.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        
+        .editor-pane {
+            flex: 1;
+            display: none;
+        }
+        
+        .editor-pane.active {
+            display: block;
+        }
+        
+        .code-editor {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+        
+        .code-editor:focus {
+            border-color: #2563eb;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+        }
+        
+        .no-template {
+            text-align: center;
+            padding: 50px;
+            color: #6b7280;
+        }
+        
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">🏛️</span>
+            <span class="logo-text">المحافظة العقارية</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>لوحة التحكم</span>
+            </a>
+            <a href="certificates.html" class="nav-item">
+                <span class="nav-icon">📜</span>
+                <span>الشهادات السلبية</span>
+            </a>
+            <a href="documents.html" class="nav-item">
+                <span class="nav-icon">📄</span>
+                <span>طلبات الوثائق</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <span class="nav-icon">💬</span>
+                <span>الرسائل</span>
+            </a>
+            <a href="template-editor.html" class="nav-item active">
+                <span class="nav-icon">🎨</span>
+                <span>محرر القوالب</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">
+                <span>🚪</span>
+                <span>تسجيل الخروج</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+            <h1>🎨 محرر القوالب</h1>
+            <div class="user-info">
+                <span class="user-avatar">👨‍💼</span>
+                <span class="user-name" id="userName">المدير</span>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="success-message" id="successMessage"></div>
+            <div class="error-message" id="errorMessage"></div>
+            
+            <div class="template-editor">
+                <!-- Templates List -->
+                <div class="templates-list">
+                    <h3 style="margin-bottom: 20px; color: #1f2937;">القوالب المتاحة</h3>
+                    
+                    <div class="template-item" data-template="certificate">
+                        <div class="template-icon">📄</div>
+                        <div class="template-name">شهادة سلبية</div>
+                        <div class="template-desc">قالب طباعة الشهادة السلبية</div>
+                    </div>
+                    
+                    <div class="template-item" data-template="document">
+                        <div class="template-icon">🏠</div>
+                        <div class="template-name">بطاقة عقارية</div>
+                        <div class="template-desc">قالب طباعة البطاقة العقارية</div>
+                    </div>
+                </div>
+                
+                <!-- Editor Panel -->
+                <div class="editor-panel">
+                    <div id="noTemplate" class="no-template">
+                        <h3>اختر قالباً للتعديل</h3>
+                        <p>اختر أحد القوالب من القائمة الجانبية لبدء التعديل</p>
+                    </div>
+                    
+                    <div id="editorContent" style="display: none; height: 100%;">
+                        <div class="editor-header">
+                            <div class="editor-title" id="editorTitle">محرر القالب</div>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" onclick="resetTemplate()">استعادة الافتراضي</button>
+                                <button class="btn btn-primary" onclick="previewTemplate()">معاينة</button>
+                                <button class="btn btn-success" onclick="saveTemplate()">حفظ</button>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-content">
+                            <div class="editor-tabs">
+                                <div class="editor-tab active" onclick="switchTab('html')">HTML</div>
+                                <div class="editor-tab" onclick="switchTab('css')">CSS</div>
+                                <div class="editor-tab" onclick="switchTab('preview')">معاينة</div>
+                            </div>
+                            
+                            <div class="editor-pane active" id="htmlPane">
+                                <textarea class="code-editor" id="htmlEditor" placeholder="كود HTML للقالب..."></textarea>
+                            </div>
+                            
+                            <div class="editor-pane" id="cssPane">
+                                <textarea class="code-editor" id="cssEditor" placeholder="كود CSS للتنسيق..."></textarea>
+                            </div>
+                            
+                            <div class="editor-pane" id="previewPane">
+                                <iframe class="preview-frame" id="previewFrame"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+        
+        let currentTemplate = null;
+        let templates = {};
+        
+        // Check authentication
+        FirebaseService.onAuthChange((user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('userName').textContent = user.email.split('@')[0];
+                initializeEditor();
+            }
+        });
+        
+        function initializeEditor() {
+            // Initialize default templates
+            templates = {
+                certificate: {
+                    name: 'شهادة سلبية',
+                    html: getDefaultCertificateHTML(),
+                    css: getDefaultCertificateCSS()
+                },
+                document: {
+                    name: 'بطاقة عقارية',
+                    html: getDefaultDocumentHTML(),
+                    css: getDefaultDocumentCSS()
+                }
+            };
+            
+            // Load saved templates from localStorage
+            const saved = localStorage.getItem('templateEditor_templates');
+            if (saved) {
+                try {
+                    const savedTemplates = JSON.parse(saved);
+                    templates = { ...templates, ...savedTemplates };
+                } catch (e) {
+                    console.error('Error loading saved templates:', e);
+                }
+            }
+            
+            // Add event listeners
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const templateType = item.dataset.template;
+                    selectTemplate(templateType);
+                });
+            });
+        }
+        
+        function selectTemplate(templateType) {
+            currentTemplate = templateType;
+            
+            // Update UI
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-template="${templateType}"]`).classList.add('active');
+            
+            // Show editor
+            document.getElementById('noTemplate').style.display = 'none';
+            document.getElementById('editorContent').style.display = 'block';
+            
+            // Load template content
+            const template = templates[templateType];
+            document.getElementById('editorTitle').textContent = `محرر ${template.name}`;
+            document.getElementById('htmlEditor').value = template.html;
+            document.getElementById('cssEditor').value = template.css;
+            
+            // Update preview
+            updatePreview();
+        }
+        
+        window.switchTab = function(tab) {
+            // Update tabs
+            document.querySelectorAll('.editor-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // Update panes
+            document.querySelectorAll('.editor-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${tab}Pane`).classList.add('active');
+            
+            if (tab === 'preview') {
+                updatePreview();
+            }
+        };
+        
+        function updatePreview() {
+            if (!currentTemplate) return;
+            
+            const html = document.getElementById('htmlEditor').value;
+            const css = document.getElementById('cssEditor').value;
+            
+            const previewContent = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <style>${css}</style>
+                </head>
+                <body>${html}</body>
+                </html>
+            `;
+            
+            const frame = document.getElementById('previewFrame');
+            frame.srcdoc = previewContent;
+        }
+        
+        window.previewTemplate = function() {
+            switchTab('preview');
+        };
+        
+        window.saveTemplate = function() {
+            if (!currentTemplate) return;
+            
+            const html = document.getElementById('htmlEditor').value;
+            const css = document.getElementById('cssEditor').value;
+            
+            templates[currentTemplate].html = html;
+            templates[currentTemplate].css = css;
+            
+            // Save to localStorage
+            localStorage.setItem('templateEditor_templates', JSON.stringify(templates));
+            
+            showMessage('تم حفظ القالب بنجاح!', 'success');
+        };
+        
+        window.resetTemplate = function() {
+            if (!currentTemplate) return;
+            
+            if (confirm('هل أنت متأكد من استعادة القالب الافتراضي؟ سيتم فقدان جميع التعديلات.')) {
+                if (currentTemplate === 'certificate') {
+                    templates.certificate.html = getDefaultCertificateHTML();
+                    templates.certificate.css = getDefaultCertificateCSS();
+                } else if (currentTemplate === 'document') {
+                    templates.document.html = getDefaultDocumentHTML();
+                    templates.document.css = getDefaultDocumentCSS();
+                }
+                
+                // Update editors
+                document.getElementById('htmlEditor').value = templates[currentTemplate].html;
+                document.getElementById('cssEditor').value = templates[currentTemplate].css;
+                
+                updatePreview();
+                showMessage('تم استعادة القالب الافتراضي', 'success');
+            }
+        };
+        
+        function showMessage(message, type) {
+            const element = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+            element.textContent = message;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+        
+        function getDefaultCertificateHTML() {
+            return `<div class="certificate">
+    <div class="header">
+        <div class="logo">🏛️</div>
+        <h1 class="title">الجمهورية الجزائرية الديمقراطية الشعبية</h1>
+        <h2 class="subtitle">المحافظة العقارية</h2>
+        <h3 class="subtitle">شهادة سلبية</h3>
+    </div>
+    
+    <div class="content">
+        <p class="statement">نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:</p>
+        
+        <div class="field">
+            <strong>اللقب:</strong>
+            <span class="value">[اللقب]</span>
+        </div>
+        
+        <div class="field">
+            <strong>الاسم:</strong>
+            <span class="value">[الاسم]</span>
+        </div>
+        
+        <div class="field">
+            <strong>اسم الأب:</strong>
+            <span class="value">[اسم الأب]</span>
+        </div>
+        
+        <div class="field">
+            <strong>تاريخ الميلاد:</strong>
+            <span class="value">[تاريخ الميلاد]</span>
+        </div>
+        
+        <div class="field">
+            <strong>مكان الميلاد:</strong>
+            <span class="value">[مكان الميلاد]</span>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>هذه الشهادة صالحة لمدة ثلاثة أشهر من تاريخ الإصدار</strong></p>
+        <div class="date">
+            <strong>التاريخ:</strong> <span class="value">[التاريخ]</span>
+        </div>
+    </div>
+</div>`;
+        }
+        
+        function getDefaultCertificateCSS() {
+            return `@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+body {
+    font-family: 'Tajawal', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: white;
+    color: #333;
+    line-height: 1.6;
+}
+
+.certificate {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    border: 3px solid #2563eb;
+    border-radius: 10px;
+    background: white;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 20px;
+}
+
+.logo {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #2563eb;
+    margin: 10px 0;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.content {
+    margin: 30px 0;
+    font-size: 1.1rem;
+}
+
+.statement {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.field {
+    margin: 15px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-right: 4px solid #2563eb;
+}
+
+.field strong {
+    color: #2563eb;
+    margin-left: 10px;
+}
+
+.value {
+    color: #333;
+}
+
+.footer {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 2px solid #2563eb;
+    padding-top: 20px;
+}
+
+.date {
+    margin-top: 30px;
+    text-align: left;
+}`;
+        }
+        
+        function getDefaultDocumentHTML() {
+            return `<div class="card">
+    <div class="header">
+        <div class="logo">🏠</div>
+        <h1 class="title">الجمهورية الجزائرية الديمقراطية الشعبية</h1>
+        <h2 class="subtitle">المحافظة العقارية</h2>
+        <h3 class="subtitle">البطاقة العقارية</h3>
+    </div>
+    
+    <div class="content">
+        <div class="section">
+            <div class="section-title">بيانات مقدم الطلب</div>
+            <div class="field">
+                <strong>اللقب:</strong>
+                <span class="value">[لقب مقدم الطلب]</span>
+            </div>
+            <div class="field">
+                <strong>الاسم:</strong>
+                <span class="value">[اسم مقدم الطلب]</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">بيانات صاحب الملكية</div>
+            <div class="field">
+                <strong>اللقب:</strong>
+                <span class="value">[لقب المالك]</span>
+            </div>
+            <div class="field">
+                <strong>الاسم:</strong>
+                <span class="value">[اسم المالك]</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">بيانات العقار</div>
+            <div class="field">
+                <strong>نوع البطاقة:</strong>
+                <span class="value">[نوع البطاقة]</span>
+            </div>
+            <div class="field">
+                <strong>البلدية:</strong>
+                <span class="value">[البلدية]</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>هذه البطاقة صالحة لمدة ستة أشهر من تاريخ الإصدار</strong></p>
+        <div class="date">
+            <strong>التاريخ:</strong> <span class="value">[التاريخ]</span>
+        </div>
+    </div>
+</div>`;
+        }
+        
+        function getDefaultDocumentCSS() {
+            return `@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+
+body {
+    font-family: 'Tajawal', Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: white;
+    color: #333;
+    line-height: 1.6;
+}
+
+.card {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    border: 3px solid #059669;
+    border-radius: 10px;
+    background: white;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    border-bottom: 2px solid #059669;
+    padding-bottom: 20px;
+}
+
+.logo {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #059669;
+    margin: 10px 0;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.content {
+    margin: 30px 0;
+    font-size: 1.1rem;
+}
+
+.section {
+    margin: 30px 0;
+    padding: 20px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border-right: 4px solid #059669;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #059669;
+    padding-bottom: 5px;
+}
+
+.field {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.field strong {
+    color: #059669;
+    min-width: 150px;
+}
+
+.value {
+    color: #333;
+}
+
+.footer {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 2px solid #059669;
+    padding-top: 20px;
+}
+
+.date {
+    margin-top: 30px;
+    text-align: left;
+}`;
+        }
+        
+        window.handleLogout = async function () {
+            await FirebaseService.logout();
+            window.location.href = 'login.html';
+        };
+    </script>
+    
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    </script>
+</body>
+</html>
