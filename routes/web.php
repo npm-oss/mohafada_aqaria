@@ -136,6 +136,13 @@ Route::prefix('admin')
         Route::post('/templates/restore/{type}', [App\Http\Controllers\Admin\TemplateEditorController::class, 'restore'])
             ->name('templates.restore');
 
+        // مسارات الطباعة
+        Route::get('/certificates/{id}/print', [App\Http\Controllers\Admin\PrintController::class, 'printNegativeCertificate'])
+            ->name('certificates.print');
+        
+        Route::get('/documents/{id}/print', [App\Http\Controllers\Admin\PrintController::class, 'printPropertyCard'])
+            ->name('documents.print');
+
             
 
     });
@@ -364,13 +371,7 @@ Route::post('/certificates/{id}/update-fields',
     [NegativeCertificateAdminController::class, 'updateFields']
 )->name('certificates.updateFields');
 
-// مسارات الطباعة
-Route::get('/certificates/{id}/print', 
-    [App\Http\Controllers\Admin\PrintController::class, 'printNegativeCertificate']
-)->name('certificates.print');
 
-Route::get('/documents/{id}/print', 
-    [App\Http\Controllers\Admin\PrintController::class, 'printPropertyCard']
 )->name('documents.print');
 
 

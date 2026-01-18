@@ -42,6 +42,8 @@
 
             <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/payments">💰 الدفع الإلكتروني</a></li>
 
+            <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="{{ route('admin.templates.editor') }}">🎨 محرر القوالب</a></li>
+
             <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/settings">⚙️ الإعدادات</a></li>
 
             <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/change-password">🔐 تغيير كلمة المرور</a></li>

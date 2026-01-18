@@ -32,27 +32,25 @@
                     <td>{{ $certificate->status }}</td>
                     <td>{{ $certificate->created_at->format('d/m/Y') }}</td>
                     <td class="top-actions">
-                        <a href="{{ route('admin.certificates.show', $certificate->id) }}" class="btn-process">عرض</a>
+                        <a href="{{ route('admin.certificates.show', $certificate->id) }}" class="btn-process" style="background-color: #3b82f6; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin: 2px; font-size: 12px; display: inline-block;">👁️ عرض</a>
 
-                        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
-                        @if($certificate->status === 'approved')
+                        {{-- زر الطباعة - دائماً ظاهر --}}
                         <a href="{{ route('admin.certificates.print', $certificate->id) }}" 
                            class="btn-print" 
                            target="_blank"
-                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin-left: 5px; font-size: 12px;">
+                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin: 2px; font-size: 12px; display: inline-block;">
                             🖨️ طباعة
                         </a>
-                        @endif
 
                         @if($certificate->status === 'pending')
                         <form action="{{ route('admin.certificates.approve', $certificate->id) }}" method="POST" style="display:inline">
                             @csrf
-                            
+                            <button type="submit" style="background-color: #22c55e; color: white; padding: 5px 10px; border-radius: 3px; border: none; cursor: pointer; margin: 2px; font-size: 12px;">✅ موافقة</button>
                         </form>
 
                         <form action="{{ route('admin.certificates.reject', $certificate->id) }}" method="POST" style="display:inline">
                             @csrf
-                            
+                            <button type="submit" style="background-color: #ef4444; color: white; padding: 5px 10px; border-radius: 3px; border: none; cursor: pointer; margin: 2px; font-size: 12px;">❌ رفض</button>
                         </form>
                         @endif
                     </td>

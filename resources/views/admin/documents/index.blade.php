@@ -66,19 +66,18 @@
                     <td class="actions-cell">
 
                         <a href="{{ route('admin.documents.show',$req->id) }}"
-                           class="btn view-btn">
-                            عرض
+                           class="btn view-btn"
+                           style="background-color: #3b82f6; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin: 2px; font-size: 12px; display: inline-block;">
+                            👁️ عرض
                         </a>
 
-                        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
-                        @if($req->status === 'approved')
+                        {{-- زر الطباعة - دائماً ظاهر --}}
                         <a href="{{ route('admin.documents.print', $req->id) }}" 
                            class="btn print-btn" 
                            target="_blank"
-                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin-left: 5px; font-size: 12px;">
+                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin: 2px; font-size: 12px; display: inline-block;">
                             🖨️ طباعة
                         </a>
-                        @endif
 
                     </td>
 

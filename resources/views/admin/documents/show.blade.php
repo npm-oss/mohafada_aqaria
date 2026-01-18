@@ -89,28 +89,33 @@
         <div class="side-card">
             <h3>الإجراءات</h3>
 
-            <!-- معالجة -->
-            <a href="{{ route('admin.documents.process',$request->id) }}" class="btn blue">
-                معالجة
-            </a>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                <!-- معالجة -->
+                <a href="{{ route('admin.documents.process',$request->id) }}" 
+                   class="btn blue"
+                   style="background-color: #3b82f6; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                    ⚙️ معالجة
+                </a>
 
-            {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
-            @if($request->status === 'approved')
-            <a href="{{ route('admin.documents.print', $request->id) }}" 
-               class="btn green" 
-               target="_blank"
-               style="background-color: #10b981; margin-left: 10px;">
-                🖨️ طباعة البطاقة
-            </a>
-            @endif
+                {{-- زر الطباعة - دائماً ظاهر --}}
+                <a href="{{ route('admin.documents.print', $request->id) }}" 
+                   class="btn green" 
+                   target="_blank"
+                   style="background-color: #10b981; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                    🖨️ طباعة البطاقة
+                </a>
 
-            <!-- حذف -->
-            <form method="POST" action="{{ route('admin.documents.destroy',$request->id) }}"
-                  onsubmit="return confirm('هل أنت متأكد من الحذف؟')">
-                @csrf
-                @method('DELETE')
-                <button class="btn red">حذف</button>
-            </form>
+                <!-- حذف -->
+                <form method="POST" action="{{ route('admin.documents.destroy',$request->id) }}"
+                      onsubmit="return confirm('هل أنت متأكد من الحذف؟')"
+                      style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button class="btn red" style="background-color: #ef4444; color: white; padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold;">
+                        🗑️ حذف
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 

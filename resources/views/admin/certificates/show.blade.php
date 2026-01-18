@@ -30,21 +30,26 @@ extends('layouts.admi @extends('layouts.admin-simple')
         <div class="row"><label>رقم الهاتف:</label> <span>{{ $certificate->phone }}</span></div>
     </div>
 
-    {{-- زر المعالجة --}}
-    <div class="extract-card top-actions">
-        <a href="{{ route('admin.certificates.process', $certificate->id) }}" class="btn-process">
+    {{-- الأزرار --}}
+    <div class="extract-card top-actions" style="display: flex; gap: 10px; flex-wrap: wrap; padding: 20px;">
+        <a href="{{ route('admin.certificates.process', $certificate->id) }}" 
+           class="btn-process"
+           style="background-color: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
             ⚙️ معالجة
         </a>
 
-        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
-        @if($certificate->status === 'approved')
+        {{-- زر الطباعة - دائماً ظاهر --}}
         <a href="{{ route('admin.certificates.print', $certificate->id) }}" 
            class="btn-print" 
            target="_blank"
-           style="background-color: #10b981; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-left: 10px;">
+           style="background-color: #10b981; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
             🖨️ طباعة الشهادة
         </a>
-        @endif
+
+        <a href="{{ route('admin.certificates.index') }}" 
+           style="background-color: #6b7280; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+            ← رجوع للقائمة
+        </a>
     </div>
 
 </div>
