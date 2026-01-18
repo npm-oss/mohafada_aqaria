@@ -182,17 +182,32 @@
                     const el = document.createElement('div');
                     el.className = 'draggable-element';
 
-                    el.style.left = (elData.x || 0) + 'px';
-                    el.style.top = (elData.y || 0) + 'px';
-
+                    // Apply full CSS style string if available
                     if (elData.style) {
-                        el.style.width = elData.style.width;
-                        el.style.height = elData.style.height;
+                        if (typeof elData.style === 'string') {
+                            el.style.cssText = elData.style;
+                        } else {
+                            // Object format fallback
+                            if (elData.style.width) el.style.width = elData.style.width;
+                            if (elData.style.height) el.style.height = elData.style.height;
+                        }
                     }
 
+                    // Apply positioning using transform (matching editor behavior)
+                    const x = parseFloat(elData.x) || 0;
+                    const y = parseFloat(elData.y) || 0;
+                    el.style.transform = `translate(${x}px, ${y}px)`;
+
+                    // Content - strip out editor control buttons
                     if (elData.html) {
                         let contentHtml = elData.html;
+
+                        // Remove .element-controls (duplicate/delete buttons)
+                        contentHtml = contentHtml.replace(/<div class="element-controls">[\s\S]*?<\/div>/gi, '');
+
+                        // Replace variables with actual data
                         contentHtml = replaceVariables(contentHtml, data);
+
                         el.innerHTML = contentHtml;
                     }
 
