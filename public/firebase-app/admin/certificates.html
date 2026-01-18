@@ -270,8 +270,17 @@
 
         window.deleteCertificate = async function (id) {
             if (confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟')) {
-                await FirebaseService.deleteCertificate(id);
-                loadCertificates();
+                try {
+                    const result = await FirebaseService.deleteCertificate(id);
+                    if (result.success) {
+                        loadCertificates();
+                    } else {
+                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                    }
+                } catch (e) {
+                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    console.error(e);
+                }
             }
         };
 
@@ -314,9 +323,18 @@
                 status: document.getElementById('edit_status').value
             };
 
-            await FirebaseService.updateCertificate(id, data);
-            document.getElementById('editModal').classList.remove('active');
-            loadCertificates();
+            try {
+                const result = await FirebaseService.updateCertificate(id, data);
+                if (result.success) {
+                    document.getElementById('editModal').classList.remove('active');
+                    loadCertificates();
+                } else {
+                    alert('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'));
+                }
+            } catch (e) {
+                alert('خطأ برمجي أثناء الحفظ: ' + e.message);
+                console.error(e);
+            }
         };
 
         window.closeModal = function (e) {

@@ -215,8 +215,17 @@
 
         window.deleteDocument = async function (id) {
             if (confirm('هل أنت متأكد من حذف هذا الطلب نهائياً؟')) {
-                await FirebaseService.deleteDocumentRequest(id);
-                loadDocs();
+                try {
+                    const result = await FirebaseService.deleteDocumentRequest(id);
+                    if (result.success) {
+                        loadDocs();
+                    } else {
+                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                    }
+                } catch (e) {
+                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    console.error(e);
+                }
             }
         };
 
@@ -259,9 +268,18 @@
                 status: document.getElementById('edit_status').value
             };
 
-            await FirebaseService.updateDocumentRequest(id, data);
-            document.getElementById('editModal').classList.remove('active');
-            loadDocs();
+            try {
+                const result = await FirebaseService.updateDocumentRequest(id, data);
+                if (result.success) {
+                    document.getElementById('editModal').classList.remove('active');
+                    loadDocs();
+                } else {
+                    alert('حدث خطأ أثناء الحفظ: ' + (result.error || 'غير معروف'));
+                }
+            } catch (e) {
+                alert('خطأ برمجي أثناء الحفظ: ' + e.message);
+                console.error(e);
+            }
         };
 
         window.closeModal = function (e) {

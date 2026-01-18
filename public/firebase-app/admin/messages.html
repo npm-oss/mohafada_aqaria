@@ -230,13 +230,13 @@
             };
 
             try {
-                // We need to update this manually as it might not be in FirebaseService yet as a generic update method for contacts
-                const updates = {};
-                updates['/contacts/' + id] = { ...allMessages.find(m => m.id === id), ...data };
-                await update(ref(db), updates);
-
-                document.getElementById('editMessageModal').classList.remove('active');
-                loadMessages();
+                const result = await FirebaseService.updateContact(id, data);
+                if (result.success) {
+                    document.getElementById('editMessageModal').classList.remove('active');
+                    loadMessages();
+                } else {
+                    alert("خطأ في حفظ التعديلات: " + (result.error || 'غير معروف'));
+                }
             } catch (err) {
                 alert("خطأ في حفظ التعديلات: " + err.message);
                 console.error(err);
@@ -255,8 +255,17 @@
 
         window.delMsg = async function (id) {
             if (confirm('هل تريد حذف هذه الرسالة؟')) {
-                await FirebaseService.deleteContact(id);
-                loadMessages();
+                try {
+                    const result = await FirebaseService.deleteContact(id);
+                    if (result.success) {
+                        loadMessages();
+                    } else {
+                        alert('حدث خطأ أثناء الحذف: ' + (result.error || 'غير معروف'));
+                    }
+                } catch (e) {
+                    alert('خطأ برمجي أثناء الحذف: ' + e.message);
+                    console.error(e);
+                }
             }
         };
 
