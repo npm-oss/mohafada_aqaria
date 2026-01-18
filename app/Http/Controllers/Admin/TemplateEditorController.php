@@ -25,13 +25,19 @@ class TemplateEditorController extends Controller
         $templatePath = $this->getTemplatePath($type);
         
         if (!Storage::disk('local')->exists($templatePath)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'القالب غير موجود'
-            ], 404);
+            // إذا لم يوجد القالب، استخدم الافتراضي
+            $defaultPath = $this->getDefaultTemplatePath($type);
+            if (Storage::disk('local')->exists($defaultPath)) {
+                $content = Storage::disk('local')->get($defaultPath);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'القالب غير موجود'
+                ], 404);
+            }
+        } else {
+            $content = Storage::disk('local')->get($templatePath);
         }
-
-        $content = Storage::disk('local')->get($templatePath);
         
         return response()->json([
             'success' => true,

@@ -111,6 +111,31 @@ Route::prefix('admin')
         Route::get('/topographic-requests', [AdminController::class, 'topographicRequests'])
             ->name('topographic.requests');
 
+        // محرر القوالب
+        Route::get('/templates/editor', [App\Http\Controllers\Admin\TemplateEditorController::class, 'index'])
+            ->name('templates.editor');
+        
+        Route::get('/templates/editor-frame/{type}', function($type) {
+            $templateNames = [
+                'negative-certificate' => 'شهادة سلبية',
+                'property-card' => 'بطاقة عقارية'
+            ];
+            
+            return view('admin.templates.editor-frame', [
+                'templateType' => $type,
+                'templateName' => $templateNames[$type] ?? 'قالب'
+            ]);
+        })->name('templates.editor-frame');
+        
+        Route::post('/templates/save-settings', [App\Http\Controllers\Admin\TemplateEditorController::class, 'saveSettings'])
+            ->name('templates.save-settings');
+        
+        Route::get('/templates/load-settings/{type}', [App\Http\Controllers\Admin\TemplateEditorController::class, 'loadSettings'])
+            ->name('templates.load-settings');
+        
+        Route::post('/templates/restore/{type}', [App\Http\Controllers\Admin\TemplateEditorController::class, 'restore'])
+            ->name('templates.restore');
+
             
 
     });
@@ -348,34 +373,7 @@ Route::get('/documents/{id}/print',
     [App\Http\Controllers\Admin\PrintController::class, 'printPropertyCard']
 )->name('documents.print');
 
-// مسارات محرر القوالب
-Route::get('/templates/editor', 
-    [App\Http\Controllers\Admin\TemplateEditorController::class, 'index']
-)->name('templates.editor');
 
-Route::get('/templates/editor-frame/{type}', function($type) {
-    $templateNames = [
-        'negative-certificate' => 'شهادة سلبية',
-        'property-card' => 'بطاقة عقارية'
-    ];
-    
-    return view('admin.templates.editor-frame', [
-        'templateType' => $type,
-        'templateName' => $templateNames[$type] ?? 'قالب'
-    ]);
-})->name('templates.editor-frame');
-
-Route::post('/templates/save-settings', 
-    [App\Http\Controllers\Admin\TemplateEditorController::class, 'saveSettings']
-)->name('templates.save-settings');
-
-Route::get('/templates/load-settings/{type}', 
-    [App\Http\Controllers\Admin\TemplateEditorController::class, 'loadSettings']
-)->name('templates.load-settings');
-
-Route::post('/templates/restore/{type}', 
-    [App\Http\Controllers\Admin\TemplateEditorController::class, 'restore']
-)->name('templates.restore');
 
 
 

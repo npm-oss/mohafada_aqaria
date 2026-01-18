@@ -268,7 +268,7 @@ async function saveToServer() {
   const state = captureState();
   
   try {
-    const response = await fetch('/admin/templates/save-settings', {
+    const response = await fetch(`/admin/templates/save-settings`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -301,7 +301,7 @@ async function loadFromServer() {
     
     if (result.success && result.settings) {
       applyState(result.settings);
-      alert('✅ تم تحميل القالب المحفوظ');
+      console.log('✅ تم تحميل القالب المحفوظ');
     }
   } catch (error) {
     console.error(error);
@@ -318,6 +318,7 @@ async function restoreDefault() {
     const response = await fetch(`/admin/templates/restore/${window.TEMPLATE_TYPE}`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'X-CSRF-TOKEN': window.CSRF_TOKEN
       }
     });
