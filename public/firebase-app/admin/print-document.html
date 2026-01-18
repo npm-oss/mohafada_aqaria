@@ -112,6 +112,7 @@
 
     <script type="module">
         import { FirebaseService } from '../js/firebase-config.js';
+        import { DEFAULT_TEMPLATES } from '../../js/default-templates.js';
 
         const urlParams = new URLSearchParams(window.location.search);
         const documentId = urlParams.get('id');
@@ -150,8 +151,8 @@
                 }
 
                 if (!templateState || !templateState.pages || templateState.pages.length === 0) {
-                    showError('لم يتم العثور على قالب محفوظ. الرجاء تصميم وحفظ قالب في محرر القوالب أولاً.');
-                    return;
+                    console.log('Using DEFAULT document template.');
+                    templateState = DEFAULT_TEMPLATES.document;
                 }
 
                 // 3. Render
@@ -242,13 +243,13 @@
                 '{{issue_date}}': new Date().toLocaleDateString('ar-DZ'),
 
                 // Arabic placeholders (matching template-editor.js updates)
-                '{{اللقب}}': data.owner_lastname || '',  // For owner
-                '{{الاسم}}': data.owner_firstname || '',  // For owner
+                '{{اللقب}}': data.owner_lastname || '',
+                '{{الاسم}}': data.owner_firstname || '',
                 '{{تاريخ_الميلاد}}': data.owner_birthdate || '',
                 '{{مكان_الميلاد}}': data.owner_birthplace || '',
-                '{{رقم_السند}}': data.plan_number || '', // Mapping plan_number to Sanad for now, or just placeholder
+                '{{رقم_السند}}': data.plan_number || '',
                 '{{الموقع}}': data.municipality || '',
-                '{{المساحة}}': '' // Area might not be in the basic request data, leaving empty or need to check data structure
+                '{{المساحة}}': ''
             };
 
             let text = html;

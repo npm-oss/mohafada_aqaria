@@ -117,6 +117,7 @@
 
     <script type="module">
         import { FirebaseService } from '../js/firebase-config.js';
+        import { DEFAULT_TEMPLATES } from '../../js/default-templates.js';
 
         const urlParams = new URLSearchParams(window.location.search);
         const certificateId = urlParams.get('id');
@@ -137,8 +138,7 @@
                     return;
                 }
 
-                // 2. Fetch Template (Try localStorage first as per editor)
-                // The editor saves to 'templateEditor_advanced'
+                // 2. Fetch Template (Try localStorage first, then Default)
                 let templateState = null;
                 const localTemplate = localStorage.getItem('templateEditor_advanced');
 
@@ -150,13 +150,10 @@
                     }
                 }
 
+                // Fallback to Default Template if no local save found
                 if (!templateState || !templateState.pages || templateState.pages.length === 0) {
-                    // Fallback mechanism or error? 
-                    // User insisted on using "Templates". If no template, we can't fulfill "strictly".
-                    // However, for robustness, we could show a default or error.
-                    // Let's show specific error to guide the user.
-                    showError('لم يتم العثور على قالب محفوظ. الرجاء تصميم وحفظ قالب في محرر القوالب أولاً.');
-                    return;
+                    console.log('Using DEFAULT certificate template.');
+                    templateState = DEFAULT_TEMPLATES.certificate;
                 }
 
                 // 3. Render
