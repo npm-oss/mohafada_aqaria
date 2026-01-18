@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>فحص الاتصال بقاعدة البيانات</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        code {
+            display: block;
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            direction: ltr;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>أداة فحص اتصال فايربيس</h1>
+
+    <div id="step1" class="status pending">1. تحميل ملف الإعدادات (firebase-config.js)...</div>
+    <div id="step2" class="status pending">2. تهيئة التطبيق (Initialize App)...</div>
+    <div id="step3" class="status pending">3. التحقق من قاعدة البيانات (Database Connection)...</div>
+
+    <div id="console-output" style="margin-top:20px; border-top:1px solid #ccc; padding-top:10px;">
+        <h3>سجل الأخطاء:</h3>
+        <pre id="log" style="color:red;"></pre>
+    </div>
+
+    <script type="module">
+        function log(msg) {
+            document.getElementById('log').innerText += msg + '\n';
+            console.error(msg);
+        }
+
+        function updateStatus(id, type, msg) {
+            const el = document.getElementById(id);
+            el.className = 'status ' + type;
+            el.innerText = msg;
+        }
+
+        try {
+            // Step 1
+            const { FirebaseService, db } = await import('../js/firebase-config.js');
+            updateStatus('step1', 'success', '1. تم تحميل ملف الإعدادات بنجاح.');
+
+            // Step 2
+            if (db) {
+                updateStatus('step2', 'success', '2. تم تهيئة التطبيق بنجاح.');
+            } else {
+                throw new Error('Database object is undefined');
+            }
+
+            // Step 3
+            updateStatus('step3', 'pending', '3. جاري اختبار الاتصال بقاعدة البيانات...');
+
+            // Try a simple read (e.g., .info/connected which is a special Firebase location)
+            // But we can't import 'ref' here easily unless we export it or import from SDK.
+            // Let's rely on FirebaseService to get something simple, or just import ref from URL.
+
+            import { ref, get, child } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+            const connectedRef = ref(db, '.info/connected');
+            const snap = await get(connectedRef);
+
+            if (snap.val() === true) {
+                updateStatus('step3', 'success', '3. تم الاتصال بقاعدة البيانات بنجاح! ✅');
+            } else {
+                // Sometimes .info/connected is false initially?
+                // Let's try to fetch actual data.
+                const testData = await FirebaseService.getNegativeCertificates();
+                updateStatus('step3', 'success', '3. تم الاتصال وجلب البيانات بنجاح! (عدد العناصر: ' + testData.length + ')');
+            }
+
+        } catch (e) {
+            log(e.toString());
+            if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+                updateStatus('step1', 'error', 'فشل تحميل الملفات. تحقق من اتصال الإنترنت.');
+            } else {
+                updateStatus('step1', 'error', 'حدث خطأ غير متوقع: ' + e.message);
+            }
+        }
+    </script>
+</body>
+
+</html>
