@@ -1336,11 +1336,11 @@
             addTemplateElement('title', 'المحافظة العقارية', 50, 80, 500, 35);
             addTemplateElement('title', 'شهادة سلبية', 50, 130, 500, 30);
             addTemplateElement('text', 'نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:', 50, 200, 500, 25);
-            addTemplateElement('text', 'اللقب: ___________________', 50, 250, 400, 25);
-            addTemplateElement('text', 'الاسم: ___________________', 50, 290, 400, 25);
-            addTemplateElement('text', 'اسم الأب: ___________________', 50, 330, 400, 25);
-            addTemplateElement('text', 'تاريخ الميلاد: ___________________', 50, 370, 400, 25);
-            addTemplateElement('text', 'مكان الميلاد: ___________________', 50, 410, 400, 25);
+            addTemplateElement('text', 'اللقب: {{اللقب}}', 50, 250, 400, 25);
+            addTemplateElement('text', 'الاسم: {{الاسم}}', 50, 290, 400, 25);
+            addTemplateElement('text', 'اسم الأب: {{اسم_الاب}}', 50, 330, 400, 25);
+            addTemplateElement('text', 'تاريخ الميلاد: {{تاريخ_الميلاد}}', 50, 370, 400, 25);
+            addTemplateElement('text', 'مكان الميلاد: {{مكان_الميلاد}}', 50, 410, 400, 25);
         }
 
         function loadDocumentTemplate() {
@@ -1349,16 +1349,20 @@
             addTemplateElement('title', 'المحافظة العقارية', 50, 80, 500, 35);
             addTemplateElement('title', 'البطاقة العقارية', 50, 130, 500, 30);
             addTemplateElement('text', 'بيانات مقدم الطلب:', 50, 200, 200, 25);
-            addTemplateElement('text', 'اللقب: ___________________', 50, 230, 400, 25);
-            addTemplateElement('text', 'الاسم: ___________________', 50, 260, 400, 25);
+            addTemplateElement('text', 'اللقب: {{اللقب}}', 50, 230, 400, 25);
+            addTemplateElement('text', 'الاسم: {{الاسم}}', 50, 260, 400, 25);
+
+            addTemplateElement('text', 'بيانات العقار:', 50, 300, 200, 25);
+            addTemplateElement('text', 'البلدية: {{الموقع}}', 50, 330, 400, 25);
+            addTemplateElement('text', 'رقم المخطط: {{رقم_السند}}', 50, 360, 400, 25);
         }
 
         function loadNationalFormTemplate() {
             // إضافة عناصر نموذج إدارة الأملاك (مبسط)
             addTemplateElement('title', 'إدارة الأملاك الوطنية', 50, 30, 500, 40);
             addTemplateElement('text', 'طلب معلومات موجزة', 50, 100, 300, 30);
-            addTemplateElement('text', 'أنا الممضي أسفله: ___________________', 50, 150, 400, 25);
-            addTemplateElement('text', 'الساكن بـ: ___________________', 50, 180, 400, 25);
+            addTemplateElement('text', 'أنا الممضي أسفله: {{الاسم}} {{اللقب}}', 50, 150, 400, 25);
+            addTemplateElement('text', 'الساكن بـ: {{الموقع}}', 50, 180, 400, 25);
             addTemplateElement('text', 'أطلب مستخرجا من:', 50, 220, 300, 25);
         }
 

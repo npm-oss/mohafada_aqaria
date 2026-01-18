@@ -313,8 +313,24 @@ function applyState(state) {
 }
 
 // ======= حفظ على السيرفر =======
+// ======= حفظ على السيرفر (مع تخزين محلي احتياطي) =======
 async function saveToServer() {
   const state = captureState();
+
+  // 1. حفظ محلي أولاً (localStorage) لضمان عمل الطباعة
+  try {
+    localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
+    console.log('✅ تم الحفظ في التخزين المحلي (localStorage)');
+  } catch (e) {
+    console.error('خطأ في الحفظ المحلي:', e);
+  }
+
+  // 2. محاولة الحفظ على السيرفر (إذا كان متاحاً)
+  if (typeof window.CSRF_TOKEN === 'undefined') {
+    // نحن في بيئة ثابتة (Static/Firebase)
+    showModal('✅ تم حفظ القالب (محلياً) بنجاح!', 'success');
+    return;
+  }
 
   try {
     const response = await fetch(`/admin/templates/save-settings`, {
@@ -329,31 +345,56 @@ async function saveToServer() {
       })
     });
 
+    if (!response.ok) throw new Error('Backend error');
+
     const result = await response.json();
 
     if (result.success) {
       showModal('✅ ' + result.message, 'success');
     } else {
-      showModal('❌ فشل الحفظ: ' + result.message, 'error');
+      showModal('⚠️ تم الحفظ محلياً فقط. ' + result.message, 'warning');
     }
   } catch (error) {
     console.error(error);
-    showModal('❌ حدث خطأ أثناء الحفظ', 'error');
+    // في حالة خطأ الاتصال، نعتبر الحفظ المحلي كافياً للتشغيل
+    showModal('✅ تم حفظ القالب (وضع غير متصل)', 'success');
   }
 }
 
 // ======= تحميل من السيرفر =======
+// ======= تحميل من السيرفر (مع تحميل محلي احتياطي) =======
 async function loadFromServer() {
-  try {
-    const response = await fetch(`/admin/templates/load-settings/${window.TEMPLATE_TYPE}`);
-    const result = await response.json();
 
-    if (result.success && result.settings) {
-      applyState(result.settings);
-      console.log('✅ تم تحميل القالب المحفوظ');
+  // 1. محاولة التحميل من السيرفر
+  if (typeof window.CSRF_TOKEN !== 'undefined') {
+    try {
+      const response = await fetch(`/admin/templates/load-settings/${window.TEMPLATE_TYPE}`);
+      const result = await response.json();
+
+      if (result.success && result.settings) {
+        applyState(result.settings);
+        console.log('✅ تم تحميل القالب المحفوظ (سيرفر)');
+        return;
+      }
+    } catch (error) {
+      console.error('خطأ في الاتصال بالسيرفر:', error);
     }
-  } catch (error) {
-    console.error(error);
+  }
+
+  // 2. محاولة التحميل من localStorage كخيار احتياطي
+  try {
+    const localState = localStorage.getItem('templateEditor_advanced');
+    if (localState) {
+      const parsed = JSON.parse(localState);
+      // التحقق من أن القالب المحفوظ محلياً يطابق النوع الحالي (إذا لزم الأمر)
+      // حالياً سنحمل ما وجدناه
+      applyState(parsed);
+      console.log('✅ تم تحميل القالب المحفوظ (محلي)');
+    } else {
+      console.log('⚠️ لا يوجد قالب محفوظ محلياً، جار تحميل الافتراضيات.');
+    }
+  } catch (e) {
+    console.error('خطأ في قراءة القالب المحلي', e);
   }
 }
 
