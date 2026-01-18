@@ -70,8 +70,15 @@
                             عرض
                         </a>
 
-                      
-                      
+                        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
+                        @if($req->status === 'approved')
+                        <a href="{{ route('admin.documents.print', $req->id) }}" 
+                           class="btn print-btn" 
+                           target="_blank"
+                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin-left: 5px; font-size: 12px;">
+                            🖨️ طباعة
+                        </a>
+                        @endif
 
                     </td>
 

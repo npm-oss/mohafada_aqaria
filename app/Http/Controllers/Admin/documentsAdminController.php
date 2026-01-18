@@ -24,13 +24,46 @@ class documentsAdminController extends Controller
         return view('admin.documents.show', compact('request'));
     }
     public function destroy($id)
-{
-    $doc = Document::findOrFail($id);
-    $doc->delete();
+    {
+        $doc = DocumentsRequest::findOrFail($id);
+        $doc->delete();
 
-    return redirect()->route('admin.documents.index')
-                     ->with('success','تم حذف الطلب بنجاح');
-}
+        return redirect()->route('admin.documents.index')
+                         ->with('success','تم حذف الطلب بنجاح');
+    }
+
+    // موافقة على الطلب
+    public function approve($id)
+    {
+        $request = DocumentsRequest::findOrFail($id);
+        $request->status = 'approved';
+        $request->save();
+
+        return redirect()->route('admin.documents.show', $id)
+                         ->with('success', 'تم الموافقة على الطلب بنجاح');
+    }
+
+    // رفض الطلب
+    public function reject($id)
+    {
+        $request = DocumentsRequest::findOrFail($id);
+        $request->status = 'rejected';
+        $request->save();
+
+        return redirect()->route('admin.documents.show', $id)
+                         ->with('success', 'تم رفض الطلب');
+    }
+
+    // استخراج الوثيقة
+    public function extract($id)
+    {
+        $request = DocumentsRequest::findOrFail($id);
+        $request->status = 'extracted';
+        $request->save();
+
+        return redirect()->route('admin.documents.show', $id)
+                         ->with('success', 'تم استخراج الوثيقة بنجاح');
+    }
 
 
     // حفظ طلب جديد

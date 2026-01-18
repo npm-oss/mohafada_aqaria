@@ -32,12 +32,19 @@ extends('layouts.admi @extends('layouts.admin-simple')
 
     {{-- زر المعالجة --}}
     <div class="extract-card top-actions">
-      <a href="{{ route('admin.certificates.process', $certificate->id) }}" class="btn-process">
-    ⚙️ معالجة
-</a>
+        <a href="{{ route('admin.certificates.process', $certificate->id) }}" class="btn-process">
+            ⚙️ معالجة
+        </a>
 
-
-
+        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
+        @if($certificate->status === 'approved')
+        <a href="{{ route('admin.certificates.print', $certificate->id) }}" 
+           class="btn-print" 
+           target="_blank"
+           style="background-color: #10b981; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-left: 10px;">
+            🖨️ طباعة الشهادة
+        </a>
+        @endif
     </div>
 
 </div>

@@ -1,0 +1,61 @@
+/* تنسيقات الطباعة */
+@media print {
+    body {
+        background-color: white !important;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .page {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 10mm 15mm !important;
+    }
+    
+    /* إخفاء العناصر غير المرغوب فيها في الطباعة */
+    .no-print {
+        display: none !important;
+    }
+    
+    /* تحسين جودة الطباعة */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+
+/* أزرار الطباعة */
+.btn-print {
+    background-color: #10b981;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-print:hover {
+    background-color: #059669;
+    color: white;
+    text-decoration: none;
+}
+
+.print-btn {
+    background-color: #10b981 !important;
+    color: white !important;
+    padding: 5px 10px;
+    border-radius: 3px;
+    text-decoration: none;
+    margin-left: 5px;
+    font-size: 12px;
+}
+
+.print-btn:hover {
+    background-color: #059669 !important;
+    color: white !important;
+    text-decoration: none;
+}

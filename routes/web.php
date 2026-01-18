@@ -215,14 +215,8 @@ Route::get('/cards/urban_private', function () {
     return view('cards.urban_private');
 })->name('card.urban_private');
 
-Route::post('/documents/store', [DocumentsAdminController::class, 'store'])
+Route::post('/documents/store', [documentsAdminController::class, 'store'])
     ->name('admin.documents.store');
-    Route::get('/admin/documents/{id}', [DocumentRequestController::class, 'show'])
-    ->name('admin.documents.show');
-
-Route::delete('/admin/documents/{id}', 
-    [App\Http\Controllers\Admin\DocumentController::class, 'destroy']
-)->name('admin.documents.destroy');
 
 Route::prefix('admin')->group(function() {
 
@@ -345,6 +339,44 @@ Route::post('/certificates/{id}/update-fields',
     [NegativeCertificateAdminController::class, 'updateFields']
 )->name('certificates.updateFields');
 
+// مسارات الطباعة
+Route::get('/certificates/{id}/print', 
+    [App\Http\Controllers\Admin\PrintController::class, 'printNegativeCertificate']
+)->name('certificates.print');
+
+Route::get('/documents/{id}/print', 
+    [App\Http\Controllers\Admin\PrintController::class, 'printPropertyCard']
+)->name('documents.print');
+
+// مسارات محرر القوالب
+Route::get('/templates/editor', 
+    [App\Http\Controllers\Admin\TemplateEditorController::class, 'index']
+)->name('templates.editor');
+
+Route::get('/templates/editor-frame/{type}', function($type) {
+    $templateNames = [
+        'negative-certificate' => 'شهادة سلبية',
+        'property-card' => 'بطاقة عقارية'
+    ];
+    
+    return view('admin.templates.editor-frame', [
+        'templateType' => $type,
+        'templateName' => $templateNames[$type] ?? 'قالب'
+    ]);
+})->name('templates.editor-frame');
+
+Route::post('/templates/save-settings', 
+    [App\Http\Controllers\Admin\TemplateEditorController::class, 'saveSettings']
+)->name('templates.save-settings');
+
+Route::get('/templates/load-settings/{type}', 
+    [App\Http\Controllers\Admin\TemplateEditorController::class, 'loadSettings']
+)->name('templates.load-settings');
+
+Route::post('/templates/restore/{type}', 
+    [App\Http\Controllers\Admin\TemplateEditorController::class, 'restore']
+)->name('templates.restore');
+
 
 
 
@@ -375,6 +407,9 @@ Route::prefix('admin')->middleware(['admin','admin'])->name('admin.')->group(fun
 
     Route::post('/documents/{id}/extract', [documentsAdminController::class,'extract'])
         ->name('documents.extract');
+
+    Route::delete('/documents/{id}', [documentsAdminController::class,'destroy'])
+        ->name('documents.destroy');
 
 
       

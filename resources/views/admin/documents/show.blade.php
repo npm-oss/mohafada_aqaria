@@ -94,6 +94,16 @@
                 معالجة
             </a>
 
+            {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
+            @if($request->status === 'approved')
+            <a href="{{ route('admin.documents.print', $request->id) }}" 
+               class="btn green" 
+               target="_blank"
+               style="background-color: #10b981; margin-left: 10px;">
+                🖨️ طباعة البطاقة
+            </a>
+            @endif
+
             <!-- حذف -->
             <form method="POST" action="{{ route('admin.documents.destroy',$request->id) }}"
                   onsubmit="return confirm('هل أنت متأكد من الحذف؟')">

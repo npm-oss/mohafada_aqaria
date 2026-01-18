@@ -34,6 +34,16 @@
                     <td class="top-actions">
                         <a href="{{ route('admin.certificates.show', $certificate->id) }}" class="btn-process">عرض</a>
 
+                        {{-- زر الطباعة - يظهر فقط عند الموافقة --}}
+                        @if($certificate->status === 'approved')
+                        <a href="{{ route('admin.certificates.print', $certificate->id) }}" 
+                           class="btn-print" 
+                           target="_blank"
+                           style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 3px; text-decoration: none; margin-left: 5px; font-size: 12px;">
+                            🖨️ طباعة
+                        </a>
+                        @endif
+
                         @if($certificate->status === 'pending')
                         <form action="{{ route('admin.certificates.approve', $certificate->id) }}" method="POST" style="display:inline">
                             @csrf

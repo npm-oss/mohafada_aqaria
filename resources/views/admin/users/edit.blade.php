@@ -4,7 +4,7 @@
 
 <h2 class="text-2xl font-bold mb-4">✏️ تعديل المستخدم</h2>
 
-<form action="{{ route('users.update', $user->id) }}" method="POST" class="space-y-4 bg-white p-6 rounded shadow">
+<form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-4 bg-white p-6 rounded shadow">
     @csrf
     @method('PUT')
 
