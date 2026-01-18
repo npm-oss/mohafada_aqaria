@@ -138,21 +138,36 @@
                     return;
                 }
 
-                // 2. Fetch Template (Try localStorage first, then Default)
+                // 2. Fetch Template (Try Firebase -> localStorage -> Default)
                 let templateState = null;
-                const localTemplate = localStorage.getItem('templateEditor_advanced');
 
-                if (localTemplate) {
-                    try {
-                        templateState = JSON.parse(localTemplate);
-                    } catch (e) {
-                        console.error('Error parsing local template', e);
+                // 2a. Try Firebase first (cloud-saved template)
+                try {
+                    const cloudTemplate = await FirebaseService.getTemplate('certificate');
+                    if (cloudTemplate && cloudTemplate.pages && cloudTemplate.pages.length > 0) {
+                        console.log('✅ Using cloud template from Firebase');
+                        templateState = cloudTemplate;
+                    }
+                } catch (e) {
+                    console.error('Failed to load from Firebase:', e);
+                }
+
+                // 2b. Try localStorage as fallback
+                if (!templateState) {
+                    const localTemplate = localStorage.getItem('templateEditor_advanced');
+                    if (localTemplate) {
+                        try {
+                            templateState = JSON.parse(localTemplate);
+                            console.log('✅ Using local template');
+                        } catch (e) {
+                            console.error('Error parsing local template', e);
+                        }
                     }
                 }
 
-                // Fallback to Default Template if no local save found
+                // 2c. Fallback to Default Template
                 if (!templateState || !templateState.pages || templateState.pages.length === 0) {
-                    console.log('Using DEFAULT certificate template.');
+                    console.log('⚠️ Using DEFAULT certificate template.');
                     templateState = DEFAULT_TEMPLATES.certificate;
                 }
 

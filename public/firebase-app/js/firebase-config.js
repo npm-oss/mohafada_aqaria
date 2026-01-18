@@ -27,7 +27,8 @@ const auth = getAuth(app);
 const NODES = {
     NEGATIVE_CERTIFICATES: 'negative_certificates',
     DOCUMENTS_REQUESTS: 'documents_requests',
-    CONTACTS: 'contacts'
+    CONTACTS: 'contacts',
+    TEMPLATES: 'templates'
 };
 
 // Firebase Service
@@ -295,6 +296,63 @@ const FirebaseService = {
 
     getCurrentUser() {
         return auth.currentUser;
+    },
+
+    // =====================
+    // TEMPLATES
+    // =====================
+
+    /**
+     * Save a template to Firebase
+     * @param {string} templateType - Type of template (e.g., 'certificate', 'document')
+     * @param {object} templateData - The template state object
+     */
+    async saveTemplate(templateType, templateData) {
+        try {
+            await set(ref(db, `${NODES.TEMPLATES}/${templateType}`), {
+                ...templateData,
+                updated_at: new Date().toISOString()
+            });
+            return { success: true };
+        } catch (error) {
+            console.error('Error saving template:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * Get a specific template by type
+     * @param {string} templateType - Type of template to retrieve
+     */
+    async getTemplate(templateType) {
+        try {
+            const snapshot = await get(child(ref(db), `${NODES.TEMPLATES}/${templateType}`));
+            if (snapshot.exists()) {
+                return snapshot.val();
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error('Error getting template:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Get all saved templates
+     */
+    async getAllTemplates() {
+        try {
+            const snapshot = await get(child(ref(db), NODES.TEMPLATES));
+            if (snapshot.exists()) {
+                return snapshot.val();
+            } else {
+                return {};
+            }
+        } catch (error) {
+            console.error('Error getting templates:', error);
+            return {};
+        }
     }
 };
 

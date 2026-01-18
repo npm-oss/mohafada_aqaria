@@ -658,6 +658,12 @@
     <!-- حقل رفع الملفات المخفي -->
     <input type="file" id="fileInput" accept=".json" style="display: none;">
 
+    <!-- Import Firebase Service -->
+    <script type="module">
+        import { FirebaseService } from '../js/firebase-config.js';
+        window.FirebaseService = FirebaseService;
+    </script>
+
     <script>
         // متغيرات عامة
         let editMode = false;
@@ -1259,18 +1265,59 @@
             }, 2000);
         }
 
-        saveBtn.addEventListener('click', () => {
-            saveToLocalStorage();
-            showModal('تم حفظ القالب بنجاح!', 'success');
+        saveBtn.addEventListener('click', async () => {
+            const state = captureCurrentState();
+            const templateType = currentTemplate || 'certificate';
+
+            // 1. Always save to localStorage first (immediate fallback)
+            localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
+            showSaveIndicator();
+
+            // 2. Try to save to Firebase (cloud storage)
+            if (window.FirebaseService) {
+                try {
+                    const result = await window.FirebaseService.saveTemplate(templateType, state);
+                    if (result.success) {
+                        showModal('✅ تم حفظ القالب في السحابة بنجاح!', 'success');
+                    } else {
+                        showModal('⚠️ تم الحفظ محلياً فقط. فشل الحفظ في السحابة.', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Firebase save error:', error);
+                    showModal('⚠️ تم الحفظ محلياً. خطأ في الاتصال بالسحابة.', 'warning');
+                }
+            } else {
+                showModal('تم حفظ القالب محلياً!', 'success');
+            }
         });
 
-        loadBtn.addEventListener('click', () => {
-            const saved = localStorage.getItem('templateEditor_advanced');
-            if (saved) {
-                loadState(saved);
-                showModal('تم تحميل القالب بنجاح!', 'success');
-            } else {
-                showModal('لا يوجد قالب محفوظ!', 'warning');
+        loadBtn.addEventListener('click', async () => {
+            const templateType = currentTemplate || 'certificate';
+            let loaded = false;
+
+            // 1. Try to load from Firebase first (latest version)
+            if (window.FirebaseService) {
+                try {
+                    const cloudTemplate = await window.FirebaseService.getTemplate(templateType);
+                    if (cloudTemplate && cloudTemplate.pages) {
+                        loadState(JSON.stringify(cloudTemplate));
+                        showModal('✅ تم تحميل القالب من السحابة!', 'success');
+                        loaded = true;
+                    }
+                } catch (error) {
+                    console.error('Firebase load error:', error);
+                }
+            }
+
+            // 2. Fallback to localStorage
+            if (!loaded) {
+                const saved = localStorage.getItem('templateEditor_advanced');
+                if (saved) {
+                    loadState(saved);
+                    showModal('تم تحميل القالب من الذاكرة المحلية!', 'success');
+                } else {
+                    showModal('لا يوجد قالب محفوظ!', 'warning');
+                }
             }
         });
 
