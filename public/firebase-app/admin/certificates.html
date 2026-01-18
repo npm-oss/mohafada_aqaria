@@ -276,20 +276,28 @@
         };
 
         window.openEditModal = function (id) {
-            const cert = allCertificates.find(c => c.id === id);
-            if (!cert) return;
+            try {
+                const cert = allCertificates.find(c => c.id === id);
+                if (!cert) {
+                    console.error('Certificate not found for ID:', id);
+                    return;
+                }
 
-            document.getElementById('edit_id').value = id;
-            document.getElementById('edit_owner_lastname').value = cert.owner_lastname || '';
-            document.getElementById('edit_owner_firstname').value = cert.owner_firstname || '';
-            document.getElementById('edit_owner_father').value = cert.owner_father || '';
-            document.getElementById('edit_owner_birthdate').value = cert.owner_birthdate || '';
-            document.getElementById('edit_owner_birthplace').value = cert.owner_birthplace || '';
-            document.getElementById('edit_phone').value = cert.phone || '';
-            document.getElementById('edit_email').value = cert.email || '';
-            document.getElementById('edit_status').value = cert.status || 'pending';
+                document.getElementById('edit_id').value = id;
+                document.getElementById('edit_owner_lastname').value = cert.owner_lastname || '';
+                document.getElementById('edit_owner_firstname').value = cert.owner_firstname || '';
+                document.getElementById('edit_owner_father').value = cert.owner_father || '';
+                document.getElementById('edit_owner_birthdate').value = cert.owner_birthdate || '';
+                document.getElementById('edit_owner_birthplace').value = cert.owner_birthplace || '';
+                document.getElementById('edit_phone').value = cert.phone || '';
+                document.getElementById('edit_email').value = cert.email || '';
+                document.getElementById('edit_status').value = cert.status || 'pending';
 
-            document.getElementById('editModal').classList.add('active');
+                document.getElementById('editModal').classList.add('active');
+            } catch (e) {
+                alert('حدث خطأ في فتح نافذة التعديل: ' + e.message);
+                console.error(e);
+            }
         };
 
         window.saveCertificate = async function (e) {

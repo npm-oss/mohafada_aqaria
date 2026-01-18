@@ -221,20 +221,28 @@
         };
 
         window.openEditModal = function (id) {
-            const doc = allDocs.find(d => d.id === id);
-            if (!doc) return;
+            try {
+                const doc = allDocs.find(d => d.id === id);
+                if (!doc) {
+                    console.error('Document not found:', id);
+                    return;
+                }
 
-            document.getElementById('edit_id').value = id;
-            document.getElementById('edit_applicant_lastname').value = doc.applicant_lastname || '';
-            document.getElementById('edit_applicant_firstname').value = doc.applicant_firstname || '';
-            document.getElementById('edit_birthdate').value = doc.birthdate || '';
-            document.getElementById('edit_birthplace').value = doc.birthplace || '';
-            document.getElementById('edit_municipality').value = doc.municipality || '';
-            document.getElementById('edit_address').value = doc.address || '';
-            document.getElementById('edit_phone').value = doc.phone || '';
-            document.getElementById('edit_status').value = doc.status || 'pending';
+                document.getElementById('edit_id').value = id;
+                document.getElementById('edit_applicant_lastname').value = doc.applicant_lastname || '';
+                document.getElementById('edit_applicant_firstname').value = doc.applicant_firstname || '';
+                document.getElementById('edit_birthdate').value = doc.birthdate || '';
+                document.getElementById('edit_birthplace').value = doc.birthplace || '';
+                document.getElementById('edit_municipality').value = doc.municipality || '';
+                document.getElementById('edit_address').value = doc.address || '';
+                document.getElementById('edit_phone').value = doc.phone || '';
+                document.getElementById('edit_status').value = doc.status || 'pending';
 
-            document.getElementById('editModal').classList.add('active');
+                document.getElementById('editModal').classList.add('active');
+            } catch (e) {
+                alert('حدث خطأ أثناء فتح النافذة: ' + e.message);
+                console.error(e);
+            }
         };
 
         window.saveDocument = async function (e) {

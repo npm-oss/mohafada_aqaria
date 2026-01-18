@@ -32,7 +32,8 @@
             <!-- Filter Bar -->
             <div class="filters-bar">
                 <input type="date" id="dateFilter" onchange="filterData()" placeholder="تاريخ">
-                <input type="text" id="searchInput" placeholder="🔍 بحث (الاسم، البريد، الموضوع)..." onkeyup="filterData()">
+                <input type="text" id="searchInput" placeholder="🔍 بحث (الاسم، البريد، الموضوع)..."
+                    onkeyup="filterData()">
             </div>
 
             <div class="card">
@@ -61,27 +62,77 @@
                 </div>
             </div>
         </div>
+
+        <!-- Edit Message Modal -->
+        <div id="editMessageModal" class="modal-overlay" onclick="closeEditModal(event)">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>تعديل الرسالة</h2>
+                    <button class="close-modal" onclick="closeEditModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMessageForm" onsubmit="saveMessage(event)">
+                        <input type="hidden" id="edit_msg_id">
+                        <div class="form-group">
+                            <label>الاسم</label>
+                            <input type="text" id="edit_msg_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" id="edit_msg_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الهاتف</label>
+                            <input type="text" id="edit_msg_phone" dir="ltr">
+                        </div>
+                        <div class="form-group">
+                            <label>الموضوع</label>
+                            <input type="text" id="edit_msg_subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الرسالة</label>
+                            <textarea id="edit_msg_content" rows="4"
+                                style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                        </div>
+                        <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                            <button type="submit" class="btn btn-primary"
+                                style="flex: 1; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 4px;">حفظ
+                                التعديلات</button>
+                            <button type="button" onclick="closeEditModal()" class="btn"
+                                style="flex: 1; padding: 10px; background: #e5e7eb; border: none; border-radius: 4px;">إلغاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </main>
     <script type="module">
         import { FirebaseService } from '../js/firebase-config.js';
-        
+        import { ref, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { db } from '../js/firebase-config.js'; // Ensure db is exported or re-initialized if accessible
+
         let allMessages = [];
 
         FirebaseService.onAuthChange(u => { if (!u) window.location.href = 'login.html'; else loadMessages(); });
-        
+
         async function loadMessages() {
-            allMessages = await FirebaseService.getContacts();
-            displayMessages(allMessages);
+            try {
+                allMessages = await FirebaseService.getContacts();
+                displayMessages(allMessages);
+            } catch (e) {
+                console.error(e);
+                alert("حدث خطأ أثناء تحميل الرسائل: " + e.message);
+            }
         }
 
-        window.filterData = function() {
+        window.filterData = function () {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const date = document.getElementById('dateFilter').value;
 
             let filtered = allMessages;
 
             if (search) {
-                filtered = filtered.filter(m => 
+                filtered = filtered.filter(m =>
                     (m.name || '').toLowerCase().includes(search) ||
                     (m.email || '').toLowerCase().includes(search) ||
                     (m.subject || '').toLowerCase().includes(search)
@@ -114,43 +165,93 @@
                     </div>
                     <div class="msg-preview"><p>${(m.message || '').substring(0, 100)}${(m.message || '').length > 100 ? '...' : ''}</p></div>
                     <div class="msg-footer">
-                        <button class="del-btn" onclick="event.stopPropagation();delMsg('${m.id}')">🗑️ حذف</button>
+                        <button class="action-btn action-view" onclick="event.stopPropagation();openMessage('${m.id}')" title="عرض التفاصيل">👁️ عرض</button>
+                        <button class="action-btn action-edit" onclick="event.stopPropagation();openEditMessage('${m.id}')" title="تعديل">✏️ تعديل</button>
+                        <button class="action-btn action-delete" onclick="event.stopPropagation();delMsg('${m.id}')" title="حذف">🗑️ حذف</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        window.openMessage = async function(id) {
+        window.openMessage = async function (id) {
+            try {
+                const m = allMessages.find(msg => msg.id === id);
+                if (!m) return;
+
+                // Mark as read
+                if (!m.read) {
+                    await FirebaseService.updateContactReadStatus(id, true);
+                    m.read = true;
+                    displayMessages(allMessages); // Refresh UI
+                }
+
+                const modalBody = document.getElementById('modalBody');
+                modalBody.innerHTML = `
+                    <div class="detail-row"><strong>الاسم:</strong> <span>${m.name}</span></div>
+                    <div class="detail-row"><strong>البريد:</strong> <span>${m.email}</span></div>
+                    <div class="detail-row"><strong>الهاتف:</strong> <span dir="ltr">${m.phone || '-'}</span></div>
+                    <div class="detail-row"><strong>الموضوع:</strong> <span>${m.subject}</span></div>
+                    <div class="detail-row"><strong>التاريخ:</strong> <span>${m.created_at ? new Date(m.created_at).toLocaleString('ar-DZ') : '-'}</span></div>
+                    <hr>
+                    <div class="detail-content">
+                        <strong>الرسالة:</strong>
+                        <p>${m.message}</p>
+                    </div>
+                `;
+                document.getElementById('modalOverlay').classList.add('active');
+            } catch (e) {
+                alert("خطأ في فتح الرسالة: " + e.message);
+            }
+        };
+
+        window.openEditMessage = function (id) {
             const m = allMessages.find(msg => msg.id === id);
             if (!m) return;
 
-            // Mark as read
-            if (!m.read) {
-                await FirebaseService.updateContactReadStatus(id, true);
-                m.read = true;
-                displayMessages(allMessages); // Refresh UI to remove notification dot if any (or unread style)
-            }
+            document.getElementById('edit_msg_id').value = id;
+            document.getElementById('edit_msg_name').value = m.name || '';
+            document.getElementById('edit_msg_email').value = m.email || '';
+            document.getElementById('edit_msg_phone').value = m.phone || '';
+            document.getElementById('edit_msg_subject').value = m.subject || '';
+            document.getElementById('edit_msg_content').value = m.message || '';
 
-            const modalBody = document.getElementById('modalBody');
-            modalBody.innerHTML = `
-                <div class="detail-row"><strong>الاسم:</strong> <span>${m.name}</span></div>
-                <div class="detail-row"><strong>البريد:</strong> <span>${m.email}</span></div>
-                <div class="detail-row"><strong>الهاتف:</strong> <span dir="ltr">${m.phone || '-'}</span></div>
-                <div class="detail-row"><strong>الموضوع:</strong> <span>${m.subject}</span></div>
-                <div class="detail-row"><strong>التاريخ:</strong> <span>${m.created_at ? new Date(m.created_at).toLocaleString('ar-DZ') : '-'}</span></div>
-                <hr>
-                <div class="detail-content">
-                    <strong>الرسالة:</strong>
-                    <p>${m.message}</p>
-                </div>
-            `;
-            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('editMessageModal').classList.add('active');
         };
 
-        window.closeModal = function(e) {
+        window.saveMessage = async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_msg_id').value;
+            const data = {
+                name: document.getElementById('edit_msg_name').value,
+                email: document.getElementById('edit_msg_email').value,
+                phone: document.getElementById('edit_msg_phone').value,
+                subject: document.getElementById('edit_msg_subject').value,
+                message: document.getElementById('edit_msg_content').value
+            };
+
+            try {
+                // We need to update this manually as it might not be in FirebaseService yet as a generic update method for contacts
+                const updates = {};
+                updates['/contacts/' + id] = { ...allMessages.find(m => m.id === id), ...data };
+                await update(ref(db), updates);
+
+                document.getElementById('editMessageModal').classList.remove('active');
+                loadMessages();
+            } catch (err) {
+                alert("خطأ في حفظ التعديلات: " + err.message);
+                console.error(err);
+            }
+        };
+
+        window.closeModal = function (e) {
             if (e && e.target !== document.getElementById('modalOverlay') && !e.target.classList.contains('close-modal')) return;
             document.getElementById('modalOverlay').classList.remove('active');
         };
+
+        window.closeEditModal = function (e) {
+            if (e && e.target !== document.getElementById('editMessageModal') && !e.target.classList.contains('close-modal') && !e.target.classList.contains('btn')) return;
+            document.getElementById('editMessageModal').classList.remove('active');
+        }
 
         window.delMsg = async function (id) {
             if (confirm('هل تريد حذف هذه الرسالة؟')) {
@@ -168,12 +269,16 @@
             gap: 16px;
             margin-bottom: 20px;
         }
+
         .filters-bar input {
             padding: 10px;
             border: 1px solid var(--gray-200);
             border-radius: var(--radius);
         }
-        .filters-bar #searchInput { flex: 1; }
+
+        .filters-bar #searchInput {
+            flex: 1;
+        }
 
         .message-card {
             background: var(--white);
@@ -182,7 +287,8 @@
             margin-bottom: 16px;
             border: 1px solid var(--gray-200);
             cursor: pointer;
-            transition: var(--transition)
+            transition: var(--transition);
+            position: relative;
         }
 
         .message-card:hover {
@@ -242,20 +348,51 @@
         .msg-footer {
             display: flex;
             justify-content: flex-end;
+            gap: 8px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
         }
 
-        .del-btn {
-            background: rgba(239, 68, 68, .1);
-            color: #dc2626;
+        .action-btn {
             border: none;
             padding: 6px 12px;
             border-radius: var(--radius-sm);
-            cursor: pointer
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
         }
 
-        .del-btn:hover {
+        .action-view {
+            background: rgba(59, 130, 246, .1);
+            color: #2563eb;
+        }
+
+        .action-view:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .action-edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .action-edit:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        .action-delete {
+            background: rgba(239, 68, 68, .1);
+            color: #dc2626;
+        }
+
+        .action-delete:hover {
             background: #ef4444;
-            color: white
+            color: white;
         }
 
         .total-count {
@@ -323,13 +460,30 @@
         .detail-content {
             margin-top: 16px;
         }
-        
+
         .detail-content p {
             background: var(--gray-100);
             padding: 15px;
             border-radius: var(--radius-sm);
             margin-top: 8px;
             line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </body>
