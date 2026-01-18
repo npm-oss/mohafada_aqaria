@@ -34,9 +34,9 @@
 
             <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/appointments">📅 المواعيد</a></li>
 
-            <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/certificates">📄 الشهادات السلبية</a></li>
+            <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="{{ route('admin.certificates') }}">📄 الشهادات السلبية</a></li>
 
-            <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/documents">📑 استخراج الوثائق العقارية</a></li>
+            <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="{{ route('admin.documents') }}">📑 استخراج الوثائق العقارية</a></li>
 
             <li><a class="nav-link block py-2 px-3 rounded hover:bg-blue-100" href="/admin/topographic">📐 الوثائق المسحية</a></li>
 

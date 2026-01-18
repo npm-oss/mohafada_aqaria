@@ -87,7 +87,8 @@ Route::prefix('admin')
 
         Route::get('/messages', [AdminController::class, 'messages'])->name('messages');
         Route::get('/appointments', [AdminController::class, 'appointments'])->name('appointments');
-        Route::get('/certificates', [AdminController::class, 'certificates'])->name('certificates');
+        Route::get('/certificates', [App\Http\Controllers\Admin\NegativeCertificateAdminController::class, 'index'])->name('certificates');
+        Route::get('/documents', [App\Http\Controllers\Admin\documentsAdminController::class, 'index'])->name('documents');
 
         Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
         Route::post('/settings', [AdminController::class, 'settingsUpdate'])->name('settings.update');
