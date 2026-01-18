@@ -658,13 +658,10 @@
     <!-- حقل رفع الملفات المخفي -->
     <input type="file" id="fileInput" accept=".json" style="display: none;">
 
-    <!-- Import Firebase Service -->
     <script type="module">
+        // Import Firebase Service
         import { FirebaseService } from '../js/firebase-config.js';
-        window.FirebaseService = FirebaseService;
-    </script>
 
-    <script>
         // متغيرات عامة
         let editMode = false;
         let selectedElement = null;
@@ -1274,9 +1271,9 @@
             showSaveIndicator();
 
             // 2. Try to save to Firebase (cloud storage)
-            if (window.FirebaseService) {
+            if (typeof FirebaseService !== 'undefined') {
                 try {
-                    const result = await window.FirebaseService.saveTemplate(templateType, state);
+                    const result = await FirebaseService.saveTemplate(templateType, state);
                     if (result.success) {
                         showModal('✅ تم حفظ القالب في السحابة بنجاح!', 'success');
                     } else {
@@ -1296,9 +1293,9 @@
             let loaded = false;
 
             // 1. Try to load from Firebase first (latest version)
-            if (window.FirebaseService) {
+            if (typeof FirebaseService !== 'undefined') {
                 try {
-                    const cloudTemplate = await window.FirebaseService.getTemplate(templateType);
+                    const cloudTemplate = await FirebaseService.getTemplate(templateType);
                     if (cloudTemplate && cloudTemplate.pages) {
                         loadState(JSON.stringify(cloudTemplate));
                         showModal('✅ تم تحميل القالب من السحابة!', 'success');
