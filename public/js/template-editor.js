@@ -27,20 +27,69 @@ function createPage(pageNumber) {
   pageNum.textContent = `صفحة ${pageNumber}`;
   page.appendChild(pageNum);
   
-  // محتوى افتراضي
+  // محتوى افتراضي بناءً على نوع القالب
   const content = document.createElement('div');
   content.className = 'movable';
   content.dataset.id = `page-${pageNumber}-content`;
-  content.innerHTML = `
-    <div class="topbar">
-      <div class="form-no movable" data-id="form-no-${pageNumber}" data-editable="1">عدد 1 م.ع.<br>مكرر</div>
-      <h1 class="title movable" data-id="title-${pageNumber}" data-editable="1">إدارة الأملاك الوطنية</h1>
-    </div>
-    <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 20mm;">
-      <p>محتوى الصفحة ${pageNumber}</p>
-      <p>يمكنك تعديل هذا النص وإضافة المزيد من العناصر</p>
-    </div>
-  `;
+  
+  // تحديد المحتوى بناءً على نوع القالب
+  if (window.TEMPLATE_TYPE === 'negative-certificate') {
+    content.innerHTML = `
+      <div class="topbar">
+        <div class="form-no movable" data-id="form-no-${pageNumber}" data-editable="1">عدد 1 م.ع.<br>مكرر</div>
+        <h1 class="title movable" data-id="title-${pageNumber}" data-editable="1">الجمهورية الجزائرية الديمقراطية الشعبية<br>المحافظة العقارية</h1>
+      </div>
+      <div class="movable" data-id="cert-title-${pageNumber}" data-editable="1" style="margin-top: 15mm; text-align: center;">
+        <h2 style="font-size: 24px; font-weight: bold; margin: 10mm 0;">شهادة سلبية</h2>
+      </div>
+      <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 10mm; line-height: 2;">
+        <p>نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:</p>
+        <p style="margin-top: 8mm;">اللقب: <span class="fill"></span></p>
+        <p>الاسم: <span class="fill"></span></p>
+        <p>اسم الأب: <span class="fill"></span></p>
+        <p>تاريخ الميلاد: <span class="fill"></span></p>
+        <p>مكان الميلاد: <span class="fill"></span></p>
+      </div>
+      <div class="movable" data-id="signature-${pageNumber}" data-editable="1" style="margin-top: 20mm; text-align: left;">
+        <p>المحافظ العقاري</p>
+        <p style="margin-top: 15mm;">التوقيع والختم</p>
+      </div>
+    `;
+  } else if (window.TEMPLATE_TYPE === 'property-card') {
+    content.innerHTML = `
+      <div class="topbar">
+        <div class="form-no movable" data-id="form-no-${pageNumber}" data-editable="1">عدد 1 م.ع.<br>مكرر</div>
+        <h1 class="title movable" data-id="title-${pageNumber}" data-editable="1">الجمهورية الجزائرية الديمقراطية الشعبية<br>المحافظة العقارية</h1>
+      </div>
+      <div class="movable" data-id="card-title-${pageNumber}" data-editable="1" style="margin-top: 15mm; text-align: center;">
+        <h2 style="font-size: 24px; font-weight: bold; margin: 10mm 0;">البطاقة العقارية</h2>
+      </div>
+      <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 10mm; line-height: 2;">
+        <h3 style="font-weight: bold; margin-bottom: 5mm;">بيانات مقدم الطلب:</h3>
+        <p>اللقب: <span class="fill"></span></p>
+        <p>الاسم: <span class="fill"></span></p>
+        <p>تاريخ الميلاد: <span class="fill"></span></p>
+        <p>مكان الميلاد: <span class="fill"></span></p>
+        
+        <h3 style="font-weight: bold; margin: 8mm 0 5mm;">بيانات العقار:</h3>
+        <p>رقم السند: <span class="fill"></span></p>
+        <p>الموقع: <span class="fill"></span></p>
+        <p>المساحة: <span class="fill"></span></p>
+      </div>
+    `;
+  } else {
+    // محتوى افتراضي عام
+    content.innerHTML = `
+      <div class="topbar">
+        <div class="form-no movable" data-id="form-no-${pageNumber}" data-editable="1">عدد 1 م.ع.<br>مكرر</div>
+        <h1 class="title movable" data-id="title-${pageNumber}" data-editable="1">إدارة الأملاك الوطنية</h1>
+      </div>
+      <div class="movable" data-id="content-${pageNumber}" data-editable="1" style="margin-top: 20mm;">
+        <p>محتوى الصفحة ${pageNumber}</p>
+        <p>يمكنك تعديل هذا النص وإضافة المزيد من العناصر</p>
+      </div>
+    `;
+  }
   
   page.appendChild(content);
   return page;
@@ -397,13 +446,36 @@ window.addEventListener('keydown', (e) => {
 
 // ======= التهيئة =======
 function init() {
-  // إنشاء صفحة واحدة افتراضياً
-  addPage();
-  enableInteract();
-  setEditMode(false);
-  
-  // تحميل القالب المحفوظ
-  loadFromServer();
+  try {
+    console.log('بدء تهيئة المحرر...');
+    
+    // إزالة رسالة التحميل
+    const loadingMsg = workspace.querySelector('.loading-message');
+    if (loadingMsg) {
+      loadingMsg.remove();
+    }
+    
+    // إنشاء صفحة واحدة افتراضياً
+    addPage();
+    enableInteract();
+    setEditMode(false);
+    
+    console.log('تم تهيئة المحرر بنجاح');
+    
+    // تحميل القالب المحفوظ
+    loadFromServer();
+  } catch (error) {
+    console.error('خطأ في تهيئة المحرر:', error);
+    workspace.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #c62828; font-family: Cairo, sans-serif;">
+        <h2>حدث خطأ في تحميل المحرر</h2>
+        <p>${error.message}</p>
+        <button onclick="location.reload()" style="padding: 10px 20px; background: #1f6feb; color: white; border: none; border-radius: 8px; cursor: pointer; font-family: Cairo, sans-serif; font-weight: 700;">
+          إعادة المحاولة
+        </button>
+      </div>
+    `;
+  }
 }
 
 // بدء التطبيق

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>اختبار محرر القوالب</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <link rel="stylesheet" href="css/template-editor.css">
+  
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .workspace {
+      flex: 1;
+      min-height: 400px;
+    }
+    
+    .loading-message {
+      text-align: center;
+      padding: 40px;
+      font-family: "Cairo", sans-serif;
+      font-size: 18px;
+      color: #666;
+    }
+    
+    .test-info {
+      background: #fffbea;
+      border: 2px solid #f59e0b;
+      padding: 15px;
+      margin: 10px auto;
+      max-width: calc(210mm + 24mm);
+      border-radius: 8px;
+      font-family: "Cairo", sans-serif;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-info">
+    <strong>صفحة اختبار محرر القوالب</strong> - هذه الصفحة للاختبار فقط
+  </div>
+
+  <div class="toolbar">
+    <div class="group">
+      <button id="btnEdit" class="primary">تفعيل وضع التعديل</button>
+      <button id="btnSave" class="ok" disabled>💾 حفظ التغييرات</button>
+      <button id="btnReset" class="danger" disabled>↺ إرجاع الافتراضي</button>
+    </div>
+
+    <div class="group">
+      <button id="btnAddPage" disabled>➕ إضافة صفحة</button>
+      <button id="btnRemovePage" disabled>➖ حذف الصفحة الحالية</button>
+      <span id="pageIndicator" class="page-indicator">صفحة 1 من 1</span>
+    </div>
+
+    <div class="group">
+      <button id="btnExportJson" disabled>📥 تصدير JSON</button>
+      <label style="display:inline-flex; gap:8px; align-items:center;">
+        <input id="fileImport" type="file" accept="application/json" style="display:none;">
+        <button id="btnImportJson" disabled type="button">📤 استيراد JSON</button>
+      </label>
+      <button id="btnPreview" disabled>👁️ معاينة الطباعة</button>
+    </div>
+
+    <div class="hint">
+      في وضع التعديل: انقر لتحديد عنصر، اسحب لتحريكه، اسحب الحواف لتغيير الحجم.
+      النصوص المظللة قابلة للتعديل المباشر.
+    </div>
+  </div>
+
+  <div class="workspace" id="workspace">
+    <div class="loading-message">جاري تحميل المحرر...</div>
+  </div>
+
+  <script>
+    // تمرير معلومات القالب للاختبار
+    window.TEMPLATE_TYPE = 'negative-certificate';
+    window.TEMPLATE_NAME = 'شهادة سلبية';
+    window.CSRF_TOKEN = 'test-token';
+    
+    console.log('Template Type:', window.TEMPLATE_TYPE);
+    console.log('Interact.js loaded:', typeof interact !== 'undefined');
+    
+    // تعطيل وظائف السيرفر للاختبار
+    window.saveToServer = async function() {
+      alert('✅ تم الحفظ محلياً (وضع الاختبار)');
+      const state = captureState();
+      localStorage.setItem('test-template', JSON.stringify(state));
+    };
+    
+    window.loadFromServer = async function() {
+      const saved = localStorage.getItem('test-template');
+      if (saved) {
+        try {
+          applyState(JSON.parse(saved));
+          console.log('✅ تم تحميل القالب المحفوظ محلياً');
+        } catch (e) {
+          console.error('خطأ في تحميل القالب:', e);
+        }
+      }
+    };
+    
+    window.restoreDefault = async function() {
+      if (!confirm('هل تريد استعادة القالب الافتراضي؟')) return;
+      localStorage.removeItem('test-template');
+      location.reload();
+    };
+  </script>
+  
+  <script src="js/template-editor.js"></script>
+</body>
+</html>
