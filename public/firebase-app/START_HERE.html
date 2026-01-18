@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ابدأ من هنا - المحافظة العقارية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-right: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .warning h2 {
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .warning p {
+            color: #856404;
+            line-height: 1.8;
+        }
+        
+        .steps {
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-right: 5px solid #667eea;
+        }
+        
+        .step h3 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .step code {
+            display: block;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: transform 0.2s;
+            display: block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            border-right: 5px solid #2196f3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .info h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .info ul {
+            margin-right: 20px;
+            color: #555;
+        }
+        
+        .info li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ المحافظة العقارية</h1>
+            <p>نظام إدارة الشهادات والوثائق العقارية</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning">
+                <h2>⚠️ تنبيه مهم</h2>
+                <p>لا يمكن فتح التطبيق مباشرة من المجلد! يجب تشغيل سيرفر محلي أولاً.</p>
+            </div>
+            
+            <div class="steps">
+                <div class="step">
+                    <h3>📝 الخطوة 1: شغّل السيرفر المحلي</h3>
+                    <p><strong>على Windows:</strong> انقر مرتين على الملف:</p>
+                    <code>start-server.bat</code>
+                    <p style="margin-top: 10px;"><strong>على Linux/Mac:</strong></p>
+                    <code>chmod +x start-server.sh
+./start-server.sh</code>
+                </div>
+                
+                <div class="step">
+                    <h3>🌐 الخطوة 2: افتح المتصفح</h3>
+                    <p>بعد تشغيل السيرفر، افتح أحد هذه الروابط:</p>
+                    <code>http://localhost:8000/index.html (للزبون)
+http://localhost:8000/admin/login.html (للأدمن)
+http://localhost:8000/test-connection.html (اختبار)</code>
+                </div>
+                
+                <div class="step">
+                    <h3>🔐 الخطوة 3: أنشئ حساب أدمن</h3>
+                    <p>اذهب إلى Firebase Console وأنشئ حساب:</p>
+                    <code>https://console.firebase.google.com
+→ اختر المشروع: project-811172743097267139
+→ Authentication → Add User</code>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <a href="#" onclick="alert('يرجى تشغيل السيرفر أولاً باستخدام start-server.bat'); return false;" class="btn btn-primary">
+                    📖 دليل الاستخدام
+                </a>
+                <a href="#" onclick="alert('يرجى تشغيل السيرفر أولاً باستخدام start-server.bat'); return false;" class="btn btn-secondary">
+                    🔍 اختبار الاتصال
+                </a>
+            </div>
+            
+            <div class="info">
+                <h3>ℹ️ لماذا نحتاج سيرفر محلي؟</h3>
+                <ul>
+                    <li>التطبيق يستخدم JavaScript Modules (ES6)</li>
+                    <li>المتصفحات تمنع تحميل Modules من file:// بسبب CORS</li>
+                    <li>السيرفر المحلي يحل هذه المشكلة بتوفير http://</li>
+                    <li>Firebase يحتاج اتصال إنترنت نشط</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Check if running on localhost
+        if (window.location.protocol === 'http:' && window.location.hostname === 'localhost') {
+            // Redirect to appropriate page
+            const isAdmin = confirm('هل تريد الذهاب إلى لوحة تحكم الأدمن؟\n\nاضغط OK للأدمن\nاضغط Cancel للصفحة الرئيسية');
+            if (isAdmin) {
+                window.location.href = '/admin/login.html';
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+    </script>
+</body>
+</html>

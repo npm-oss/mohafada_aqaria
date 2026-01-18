@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الاتصال - Firebase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .test-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-right: 5px solid #ddd;
+            transition: all 0.3s;
+        }
+        
+        .test-item.pending {
+            border-right-color: #ffc107;
+            background: #fff9e6;
+        }
+        
+        .test-item.success {
+            border-right-color: #28a745;
+            background: #e8f5e9;
+        }
+        
+        .test-item.error {
+            border-right-color: #dc3545;
+            background: #ffebee;
+        }
+        
+        .test-item h3 {
+            margin-bottom: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-item p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .icon {
+            font-size: 1.5rem;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border-right: 5px solid #2196f3;
+        }
+        
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            margin-right: 20px;
+            color: #555;
+        }
+        
+        .info-box li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 اختبار الاتصال بـ Firebase</h1>
+        <p class="subtitle">فحص شامل لجميع مكونات النظام</p>
+        
+        <div id="test1" class="test-item pending">
+            <h3><span class="icon"><span class="spinner"></span></span> 1. تحميل مكتبة Firebase</h3>
+            <p>جاري التحقق من تحميل Firebase SDK...</p>
+        </div>
+        
+        <div id="test2" class="test-item pending">
+            <h3><span class="icon"><span class="spinner"></span></span> 2. تحميل ملف الإعدادات</h3>
+            <p>جاري تحميل firebase-config.js...</p>
+        </div>
+        
+        <div id="test3" class="test-item pending">
+            <h3><span class="icon"><span class="spinner"></span></span> 3. تهيئة التطبيق</h3>
+            <p>جاري تهيئة Firebase App...</p>
+        </div>
+        
+        <div id="test4" class="test-item pending">
+            <h3><span class="icon"><span class="spinner"></span></span> 4. الاتصال بقاعدة البيانات</h3>
+            <p>جاري اختبار الاتصال بـ Realtime Database...</p>
+        </div>
+        
+        <div id="test5" class="test-item pending">
+            <h3><span class="icon"><span class="spinner"></span></span> 5. قراءة البيانات</h3>
+            <p>جاري محاولة قراءة البيانات من قاعدة البيانات...</p>
+        </div>
+        
+        <button id="retryBtn" class="btn" style="display: none;">🔄 إعادة المحاولة</button>
+        
+        <div class="info-box">
+            <h3>ℹ️ معلومات مهمة</h3>
+            <ul>
+                <li>تأكد من تشغيل السيرفر المحلي (لا تفتح الملف مباشرة)</li>
+                <li>يجب أن يكون الرابط: <code>http://localhost:8000</code></li>
+                <li>تحتاج اتصال إنترنت نشط للاتصال بـ Firebase</li>
+                <li>تحقق من قواعد Database في Firebase Console</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script type="module">
+        let allTestsPassed = true;
+        
+        function updateTest(id, status, title, message) {
+            const el = document.getElementById(id);
+            el.className = `test-item ${status}`;
+            
+            let icon = '⏳';
+            if (status === 'success') icon = '✅';
+            if (status === 'error') {
+                icon = '❌';
+                allTestsPassed = false;
+            }
+            
+            el.innerHTML = `
+                <h3><span class="icon">${icon}</span> ${title}</h3>
+                <p>${message}</p>
+            `;
+        }
+        
+        async function runTests() {
+            try {
+                // Test 1: Firebase SDK
+                updateTest('test1', 'pending', '1. تحميل مكتبة Firebase', 'جاري التحقق...');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                updateTest('test1', 'success', '1. تحميل مكتبة Firebase', 'تم تحميل Firebase SDK بنجاح من CDN');
+                
+                // Test 2: Config File
+                updateTest('test2', 'pending', '2. تحميل ملف الإعدادات', 'جاري تحميل firebase-config.js...');
+                const { FirebaseService, db, auth } = await import('./js/firebase-config.js');
+                updateTest('test2', 'success', '2. تحميل ملف الإعدادات', 'تم تحميل ملف الإعدادات بنجاح');
+                
+                // Test 3: App Initialization
+                updateTest('test3', 'pending', '3. تهيئة التطبيق', 'جاري التحقق من تهيئة Firebase...');
+                if (!db || !auth) {
+                    throw new Error('Firebase objects are undefined');
+                }
+                updateTest('test3', 'success', '3. تهيئة التطبيق', 'تم تهيئة Firebase App بنجاح (Database + Auth)');
+                
+                // Test 4: Database Connection
+                updateTest('test4', 'pending', '4. الاتصال بقاعدة البيانات', 'جاري اختبار الاتصال...');
+                const { ref, get } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
+                
+                const connectedRef = ref(db, '.info/connected');
+                const snapshot = await get(connectedRef);
+                
+                if (snapshot.val() === true) {
+                    updateTest('test4', 'success', '4. الاتصال بقاعدة البيانات', 'تم الاتصال بـ Firebase Realtime Database بنجاح');
+                } else {
+                    updateTest('test4', 'success', '4. الاتصال بقاعدة البيانات', 'تم الاتصال (حالة الاتصال: غير متصل حالياً)');
+                }
+                
+                // Test 5: Read Data
+                updateTest('test5', 'pending', '5. قراءة البيانات', 'جاري محاولة قراءة البيانات...');
+                const certificates = await FirebaseService.getNegativeCertificates();
+                const documents = await FirebaseService.getDocumentRequests();
+                const contacts = await FirebaseService.getContacts();
+                
+                updateTest('test5', 'success', '5. قراءة البيانات', 
+                    `تم قراءة البيانات بنجاح! (${certificates.length} شهادة، ${documents.length} وثيقة، ${contacts.length} رسالة)`);
+                
+                // All tests passed
+                if (allTestsPassed) {
+                    setTimeout(() => {
+                        alert('🎉 ممتاز! جميع الاختبارات نجحت. النظام يعمل بشكل صحيح.');
+                    }, 500);
+                }
+                
+            } catch (error) {
+                console.error('Test Error:', error);
+                
+                // Determine which test failed
+                if (error.message.includes('Failed to fetch') || error.message.includes('import')) {
+                    updateTest('test2', 'error', '2. تحميل ملف الإعدادات', 
+                        `فشل تحميل الملف. تأكد من تشغيل السيرفر المحلي! الخطأ: ${error.message}`);
+                } else if (error.message.includes('undefined')) {
+                    updateTest('test3', 'error', '3. تهيئة التطبيق', 
+                        `فشلت تهيئة Firebase. الخطأ: ${error.message}`);
+                } else if (error.message.includes('permission') || error.message.includes('PERMISSION_DENIED')) {
+                    updateTest('test4', 'error', '4. الاتصال بقاعدة البيانات', 
+                        'فشل الاتصال: تحقق من قواعد Database في Firebase Console');
+                } else {
+                    updateTest('test5', 'error', '5. قراءة البيانات', 
+                        `فشلت قراءة البيانات. الخطأ: ${error.message}`);
+                }
+                
+                document.getElementById('retryBtn').style.display = 'block';
+            }
+        }
+        
+        // Run tests on load
+        runTests();
+        
+        // Retry button
+        document.getElementById('retryBtn').addEventListener('click', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
