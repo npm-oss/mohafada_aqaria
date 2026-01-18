@@ -803,6 +803,14 @@
         function makeElementInteractive(element) {
             interact(element)
                 .draggable({
+                    modifiers: [
+                        interact.modifiers.snap({
+                            targets: [interact.snappers.grid({ x: 10, y: 10 })],
+                            range: Infinity,
+                            relativePoints: [{ x: 0, y: 0 }],
+                            enabled: () => canvasPage.classList.contains('show-grid')
+                        })
+                    ],
                     listeners: {
                         move(event) {
                             if (!editMode) return;
@@ -816,6 +824,9 @@
                             target.setAttribute('data-y', y);
 
                             updatePropertiesPanel();
+                        },
+                        end() {
+                            saveState(); // Save after drag ends
                         }
                     }
                 })
@@ -840,6 +851,9 @@
                             target.setAttribute('data-y', y);
 
                             updatePropertiesPanel();
+                        },
+                        end() {
+                            saveState(); // Save after resize ends
                         }
                     },
                     modifiers: [
@@ -1143,22 +1157,14 @@
 
         // حفظ وتحميل الحالة
         function saveState() {
-            const state = {
-                elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
-                    id: el.dataset.id,
-                    type: el.dataset.type,
-                    html: el.innerHTML,
-                    style: el.style.cssText,
-                    x: el.getAttribute('data-x'),
-                    y: el.getAttribute('data-y')
-                }))
-            };
+            const state = captureCurrentState();
 
             undoStack.push(JSON.stringify(state));
             if (undoStack.length > 50) undoStack.shift();
             redoStack = [];
 
             updateUndoRedoButtons();
+            triggerAutoSave(); // Auto-save after each change
         }
 
         function loadState(stateString) {
@@ -1167,16 +1173,33 @@
             // مسح العناصر الحالية
             canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
 
+            // Support both old { elements } and new { pages: [{ elements }] } formats
+            let elements = [];
+            if (state.pages && state.pages.length > 0) {
+                elements = state.pages[0].elements || [];
+                if (state.templateType) {
+                    currentTemplate = state.templateType;
+                    templateSelect.value = currentTemplate;
+                }
+            } else if (state.elements) {
+                elements = state.elements;
+                if (state.template) {
+                    currentTemplate = state.template;
+                    templateSelect.value = currentTemplate;
+                }
+            }
+
             // إضافة العناصر المحفوظة
-            state.elements.forEach(elementData => {
+            elements.forEach(elementData => {
                 const element = document.createElement('div');
                 element.className = 'draggable-element';
                 element.dataset.id = elementData.id;
                 element.dataset.type = elementData.type;
                 element.innerHTML = elementData.html;
                 element.style.cssText = elementData.style;
-                element.setAttribute('data-x', elementData.x);
-                element.setAttribute('data-y', elementData.y);
+                element.setAttribute('data-x', elementData.x || 0);
+                element.setAttribute('data-y', elementData.y || 0);
+                element.style.transform = `translate(${elementData.x || 0}px, ${elementData.y || 0}px)`;
 
                 canvasPage.appendChild(element);
                 makeElementInteractive(element);
@@ -1191,20 +1214,53 @@
         }
 
         // أحداث الحفظ والتحميل
-        saveBtn.addEventListener('click', () => {
-            const state = {
-                template: currentTemplate,
-                elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
-                    id: el.dataset.id,
-                    type: el.dataset.type,
-                    html: el.innerHTML,
-                    style: el.style.cssText,
-                    x: el.getAttribute('data-x'),
-                    y: el.getAttribute('data-y')
-                }))
+        function captureCurrentState() {
+            return {
+                version: 2,
+                templateType: currentTemplate || 'certificate',
+                pages: [{
+                    pageNumber: 1,
+                    elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
+                        id: el.dataset.id,
+                        type: el.dataset.type,
+                        html: el.innerHTML,
+                        style: el.style.cssText,
+                        x: parseFloat(el.getAttribute('data-x')) || 0,
+                        y: parseFloat(el.getAttribute('data-y')) || 0
+                    }))
+                }]
             };
+        }
 
+        function saveToLocalStorage() {
+            const state = captureCurrentState();
             localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
+            showSaveIndicator();
+        }
+
+        // Auto-save with debounce
+        let autoSaveTimeout = null;
+        function triggerAutoSave() {
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                saveToLocalStorage();
+                console.log('✅ Auto-saved');
+            }, 1500);
+        }
+
+        function showSaveIndicator() {
+            saveBtn.textContent = '✅ تم الحفظ';
+            saveBtn.classList.remove('success');
+            saveBtn.classList.add('primary');
+            setTimeout(() => {
+                saveBtn.textContent = '💾 حفظ';
+                saveBtn.classList.remove('primary');
+                saveBtn.classList.add('success');
+            }, 2000);
+        }
+
+        saveBtn.addEventListener('click', () => {
+            saveToLocalStorage();
             showModal('تم حفظ القالب بنجاح!', 'success');
         });
 
@@ -1432,6 +1488,82 @@
                 }
             }
         }
+
+        // ======= Keyboard Shortcuts =======
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+S: Save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveToLocalStorage();
+                showModal('تم حفظ القالب بنجاح!', 'success');
+                return;
+            }
+
+            // Ctrl+Z: Undo
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                if (undoStack.length > 1) {
+                    redoStack.push(undoStack.pop());
+                    loadState(undoStack[undoStack.length - 1]);
+                    updateUndoRedoButtons();
+                }
+                return;
+            }
+
+            // Ctrl+Y or Ctrl+Shift+Z: Redo
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                e.preventDefault();
+                if (redoStack.length > 0) {
+                    const state = redoStack.pop();
+                    undoStack.push(state);
+                    loadState(state);
+                    updateUndoRedoButtons();
+                }
+                return;
+            }
+
+            // Ctrl+D: Duplicate
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                if (selectedElement) {
+                    copyElement(selectedElement);
+                    pasteElement();
+                }
+                return;
+            }
+
+            // Delete or Backspace: Delete selected element
+            if ((e.key === 'Delete' || e.key === 'Backspace') && selectedElement) {
+                // Don't delete if editing text
+                if (document.activeElement.isContentEditable) return;
+                e.preventDefault();
+                deleteElement(selectedElement.dataset.id);
+                return;
+            }
+
+            // Arrow keys: Move element
+            if (selectedElement && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                if (document.activeElement.isContentEditable) return;
+                e.preventDefault();
+
+                const step = e.shiftKey ? 10 : 1;
+                let x = parseFloat(selectedElement.getAttribute('data-x')) || 0;
+                let y = parseFloat(selectedElement.getAttribute('data-y')) || 0;
+
+                switch (e.key) {
+                    case 'ArrowUp': y -= step; break;
+                    case 'ArrowDown': y += step; break;
+                    case 'ArrowLeft': x -= step; break;
+                    case 'ArrowRight': x += step; break;
+                }
+
+                selectedElement.setAttribute('data-x', x);
+                selectedElement.setAttribute('data-y', y);
+                selectedElement.style.transform = `translate(${x}px, ${y}px)`;
+                updatePropertiesPanel();
+                saveState();
+            }
+        });
 
         // بدء المحرر
         initEditor();
