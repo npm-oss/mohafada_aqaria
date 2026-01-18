@@ -90,6 +90,11 @@ Route::prefix('admin')
         Route::get('/certificates', [App\Http\Controllers\Admin\NegativeCertificateAdminController::class, 'index'])->name('certificates');
         Route::get('/documents', [App\Http\Controllers\Admin\documentsAdminController::class, 'index'])->name('documents');
 
+        // صفحة اختبار الأزرار
+        Route::get('/test-buttons', function() {
+            return view('admin.test-buttons');
+        })->name('test-buttons');
+
         Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
         Route::post('/settings', [AdminController::class, 'settingsUpdate'])->name('settings.update');
 

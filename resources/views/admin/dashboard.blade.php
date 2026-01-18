@@ -102,6 +102,11 @@
                         <td class="py-2 px-4 border">
                             <a href="{{ route('admin.requests.show', $request->id) }}" class="text-blue-600 hover:underline">👁️ عرض</a>
                             <a href="{{ route('admin.requests.edit', $request->id) }}" class="text-blue-700 hover:underline ml-2">⚙️ معالجة</a>
+                            @if($request->type == 'negative_certificate')
+                                <a href="{{ route('admin.certificates.print', $request->id) }}" class="text-green-600 hover:underline ml-2" target="_blank">🖨️ طباعة</a>
+                            @elseif($request->type == 'property_card')
+                                <a href="{{ route('admin.documents.print', $request->id) }}" class="text-green-600 hover:underline ml-2" target="_blank">🖨️ طباعة</a>
+                            @endif
                         </td>
                         <td class="py-2 px-4 border">{{ $request->created_at->format('d/m/Y') }}</td>
                     </tr>
@@ -144,6 +149,12 @@
             </a>
             <a href="{{ route('admin.documents.index') }}" class="w-64 h-16 bg-gradient-to-r from-blue-300 to-blue-400 text-white rounded-full shadow-lg flex items-center justify-center text-center text-lg font-bold hover:scale-105 transform transition duration-500 hover-glow animate-fadeSlide" style="animation-delay:1.1s;">
                 📑 الوثائق العقارية
+            </a>
+            <a href="{{ route('admin.templates.editor') }}" class="w-64 h-16 bg-gradient-to-r from-purple-400 to-purple-500 text-white rounded-full shadow-lg flex items-center justify-center text-center text-lg font-bold hover:scale-105 transform transition duration-500 hover-glow animate-fadeSlide" style="animation-delay:1.15s;">
+                🎨 محرر القوالب
+            </a>
+            <a href="{{ route('admin.test-buttons') }}" class="w-64 h-16 bg-gradient-to-r from-red-400 to-red-500 text-white rounded-full shadow-lg flex items-center justify-center text-center text-lg font-bold hover:scale-105 transform transition duration-500 hover-glow animate-fadeSlide" style="animation-delay:1.17s;">
+                🧪 اختبار الأزرار
             </a>
             <a href="{{ route('admin.messages.index') }}" class="relative w-64 h-16 bg-gradient-to-r from-blue-200 to-blue-300 text-white rounded-full shadow-lg flex items-center justify-center text-center text-lg font-bold hover:scale-105 transform transition duration-500 hover-glow animate-fadeSlide" style="animation-delay:1.2s;">
                 📩 الرسائل الجديدة
