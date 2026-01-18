@@ -69,6 +69,41 @@ const FirebaseService = {
         }
     },
 
+    async updateCertificate(id, data) {
+        try {
+            const updates = {};
+            // We want to merge with existing data to avoid losing fields like created_at if not passed
+            const existingRef = child(ref(db), `${NODES.NEGATIVE_CERTIFICATES}/${id}`);
+            const snapshot = await get(existingRef);
+            if (snapshot.exists()) {
+                const existingData = snapshot.val();
+                updates[`/${NODES.NEGATIVE_CERTIFICATES}/${id}`] = {
+                    ...existingData,
+                    ...data,
+                    updated_at: new Date().toISOString()
+                };
+            } else {
+                updates[`/${NODES.NEGATIVE_CERTIFICATES}/${id}`] = data;
+            }
+
+            await update(ref(db), updates);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteCertificate(id) {
+        try {
+            await set(ref(db, `${NODES.NEGATIVE_CERTIFICATES}/${id}`), null);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
     async updateCertificateStatus(id, status) {
         try {
             const updates = {};
@@ -93,6 +128,40 @@ const FirebaseService = {
                 created_at: new Date().toISOString()
             });
             return { success: true, id: newDocRef.key };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async updateDocumentRequest(id, data) {
+        try {
+            const updates = {};
+            const existingRef = child(ref(db), `${NODES.DOCUMENTS_REQUESTS}/${id}`);
+            const snapshot = await get(existingRef);
+            if (snapshot.exists()) {
+                const existingData = snapshot.val();
+                updates[`/${NODES.DOCUMENTS_REQUESTS}/${id}`] = {
+                    ...existingData,
+                    ...data,
+                    updated_at: new Date().toISOString()
+                };
+            } else {
+                updates[`/${NODES.DOCUMENTS_REQUESTS}/${id}`] = data;
+            }
+
+            await update(ref(db), updates);
+            return { success: true };
+        } catch (error) {
+            console.error('Error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    async deleteDocumentRequest(id) {
+        try {
+            await set(ref(db, `${NODES.DOCUMENTS_REQUESTS}/${id}`), null);
+            return { success: true };
         } catch (error) {
             console.error('Error:', error);
             return { success: false, error: error.message };
