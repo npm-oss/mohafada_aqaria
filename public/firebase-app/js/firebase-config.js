@@ -3,8 +3,8 @@
 // ========================================
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getDatabase, ref, push, set, get, child, update, query, orderByChild } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 // Firebase Configuration
 const firebaseConfig = {
@@ -20,11 +20,11 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getDatabase(app);
 const auth = getAuth(app);
 
-// Collections
-const COLLECTIONS = {
+// Nodes (formerly Collections)
+const NODES = {
     NEGATIVE_CERTIFICATES: 'negative_certificates',
     DOCUMENTS_REQUESTS: 'documents_requests',
     CONTACTS: 'contacts'
@@ -36,12 +36,13 @@ const FirebaseService = {
     // Negative Certificates
     async createNegativeCertificate(data) {
         try {
-            const docRef = await addDoc(collection(db, COLLECTIONS.NEGATIVE_CERTIFICATES), {
+            const newCertRef = push(ref(db, NODES.NEGATIVE_CERTIFICATES));
+            await set(newCertRef, {
                 ...data,
                 status: 'pending',
                 created_at: new Date().toISOString()
             });
-            return { success: true, id: docRef.id };
+            return { success: true, id: newCertRef.key };
         } catch (error) {
             console.error('Error:', error);
             return { success: false, error: error.message };
@@ -50,9 +51,18 @@ const FirebaseService = {
 
     async getNegativeCertificates() {
         try {
-            const q = query(collection(db, COLLECTIONS.NEGATIVE_CERTIFICATES), orderBy('created_at', 'desc'));
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, NODES.NEGATIVE_CERTIFICATES));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                // Convert object of objects to array of objects
+                return Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at)); // Sort desc
+            } else {
+                return [];
+            }
         } catch (error) {
             console.error('Error:', error);
             return [];
@@ -61,10 +71,11 @@ const FirebaseService = {
 
     async updateCertificateStatus(id, status) {
         try {
-            await updateDoc(doc(db, COLLECTIONS.NEGATIVE_CERTIFICATES, id), {
-                status,
-                updated_at: new Date().toISOString()
-            });
+            const updates = {};
+            updates[`/${NODES.NEGATIVE_CERTIFICATES}/${id}/status`] = status;
+            updates[`/${NODES.NEGATIVE_CERTIFICATES}/${id}/updated_at`] = new Date().toISOString();
+
+            await update(ref(db), updates);
             return { success: true };
         } catch (error) {
             console.error('Error:', error);
@@ -75,12 +86,13 @@ const FirebaseService = {
     // Document Requests
     async createDocumentRequest(data) {
         try {
-            const docRef = await addDoc(collection(db, COLLECTIONS.DOCUMENTS_REQUESTS), {
+            const newDocRef = push(ref(db, NODES.DOCUMENTS_REQUESTS));
+            await set(newDocRef, {
                 ...data,
                 status: 'pending',
                 created_at: new Date().toISOString()
             });
-            return { success: true, id: docRef.id };
+            return { success: true, id: newDocRef.key };
         } catch (error) {
             console.error('Error:', error);
             return { success: false, error: error.message };
@@ -89,9 +101,17 @@ const FirebaseService = {
 
     async getDocumentRequests() {
         try {
-            const q = query(collection(db, COLLECTIONS.DOCUMENTS_REQUESTS), orderBy('created_at', 'desc'));
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, NODES.DOCUMENTS_REQUESTS));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                return Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else {
+                return [];
+            }
         } catch (error) {
             console.error('Error:', error);
             return [];
@@ -101,12 +121,13 @@ const FirebaseService = {
     // Contacts
     async createContact(data) {
         try {
-            const docRef = await addDoc(collection(db, COLLECTIONS.CONTACTS), {
+            const newContactRef = push(ref(db, NODES.CONTACTS));
+            await set(newContactRef, {
                 ...data,
                 read: false,
                 created_at: new Date().toISOString()
             });
-            return { success: true, id: docRef.id };
+            return { success: true, id: newContactRef.key };
         } catch (error) {
             console.error('Error:', error);
             return { success: false, error: error.message };
@@ -115,9 +136,17 @@ const FirebaseService = {
 
     async getContacts() {
         try {
-            const q = query(collection(db, COLLECTIONS.CONTACTS), orderBy('created_at', 'desc'));
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const dbRef = ref(db);
+            const snapshot = await get(child(dbRef, NODES.CONTACTS));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                return Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            } else {
+                return [];
+            }
         } catch (error) {
             console.error('Error:', error);
             return [];
@@ -153,7 +182,8 @@ const FirebaseService = {
     }
 };
 
-// Export
+// Export (Keeping COLLECTIONS for backward compatibility with other files if needed, though renamed locally to NODES)
+const COLLECTIONS = NODES;
 window.FirebaseService = FirebaseService;
 window.COLLECTIONS = COLLECTIONS;
 
