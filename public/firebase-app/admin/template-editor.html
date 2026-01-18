@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر القوالب المتقدم - المحافظة العقارية</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Interact.js للسحب والإفلات وتغيير الحجم -->
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+
+    <!-- HTML2Canvas و jsPDF للتصدير -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --page-width: 210mm;
+            --page-height: 297mm;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', Arial, sans-serif;
+            background: var(--gray-100);
+            overflow-x: hidden;
+        }
+
+        /* شريط الأدوات العلوي */
+        .top-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--gray-900);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: var(--gray-700);
+            color: white;
+            text-decoration: none;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--gray-600);
+        }
+
+        .toolbar-btn.primary {
+            background: var(--primary);
+        }
+
+        .toolbar-btn.primary:hover {
+            background: #1d4ed8;
+        }
+
+        .toolbar-btn.success {
+            background: var(--success);
+        }
+
+        .toolbar-btn.success:hover {
+            background: #047857;
+        }
+
+        .toolbar-btn.danger {
+            background: var(--danger);
+        }
+
+        .toolbar-btn.danger:hover {
+            background: #b91c1c;
+        }
+
+        .toolbar-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* منطقة العمل الرئيسية */
+        .editor-workspace {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* الشريط الجانبي للأدوات */
+        .sidebar-tools {
+            width: 280px;
+            background: white;
+            border-left: 1px solid var(--gray-200);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .tool-section {
+            margin-bottom: 25px;
+        }
+
+        .tool-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 8px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .tool-item {
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .tool-item:hover {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .tool-item.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .tool-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .tool-name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* لوحة الخصائص */
+        .properties-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .properties-panel.active {
+            display: block;
+        }
+
+        .property-group {
+            margin-bottom: 15px;
+        }
+
+        .property-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .color-picker-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .font-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* منطقة الكانفاس */
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px;
+            background: var(--gray-200);
+            overflow: auto;
+        }
+
+        .canvas-page {
+            width: var(--page-width);
+            min-height: var(--page-height);
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* العناصر القابلة للتحريك */
+        .draggable-element {
+            position: absolute;
+            cursor: move;
+            border: 2px solid transparent;
+            min-width: 50px;
+            min-height: 30px;
+            user-select: none;
+        }
+
+        .draggable-element:hover {
+            border-color: rgba(37, 99, 235, 0.5);
+        }
+
+        .draggable-element.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        /* أنواع العناصر */
+        .text-element {
+            padding: 8px;
+            background: transparent;
+            border-radius: 4px;
+            font-family: 'Tajawal', Arial, sans-serif;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.4;
+            outline: none;
+            resize: none;
+            border: none;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+        .text-element[contenteditable="true"] {
+            background: rgba(255, 235, 59, 0.1);
+        }
+
+        .shape-element {
+            border-radius: 4px;
+        }
+
+        /* وضع التعديل */
+        .edit-mode .canvas-page {
+            cursor: crosshair;
+        }
+
+        .edit-mode .draggable-element {
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        /* أدوات التحكم في العنصر المحدد */
+        .element-controls {
+            position: absolute;
+            top: -35px;
+            right: 0;
+            display: none;
+            gap: 5px;
+            z-index: 100;
+        }
+
+        .draggable-element.selected .element-controls {
+            display: flex;
+        }
+
+        .control-btn {
+            width: 25px;
+            height: 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background: var(--gray-700);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: var(--gray-600);
+        }
+
+        .control-btn.danger {
+            background: var(--danger);
+        }
+
+        .control-btn.danger:hover {
+            background: #b91c1c;
+        }
+
+        /* شبكة المساعدة */
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0.1;
+            background-image:
+                linear-gradient(to right, #000 1px, transparent 1px),
+                linear-gradient(to bottom, #000 1px, transparent 1px);
+            background-size: 20px 20px;
+            display: none;
+        }
+
+        .show-grid .grid-overlay {
+            display: block;
+        }
+
+        /* قائمة السياق */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 5px 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background: var(--gray-100);
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 5px 0;
+        }
+
+        /* تحسينات الاستجابة */
+        @media (max-width: 1024px) {
+            .sidebar-tools {
+                width: 250px;
+            }
+
+            .canvas-area {
+                padding: 15px;
+            }
+
+            .canvas-page {
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .editor-workspace {
+                flex-direction: column;
+            }
+
+            .sidebar-tools {
+                width: 100%;
+                height: 200px;
+                order: 2;
+            }
+
+            .canvas-area {
+                order: 1;
+                height: calc(100vh - 280px);
+            }
+
+            .canvas-page {
+                transform: scale(0.6);
+            }
+        }
+
+        /* إخفاء شريط الأدوات عند الطباعة */
+        @media print {
+
+            .top-toolbar,
+            .sidebar-tools {
+                display: none !important;
+            }
+
+            .canvas-area {
+                padding: 0;
+                background: white;
+            }
+
+            .canvas-page {
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .draggable-element {
+                border: none !important;
+            }
+
+            .element-controls {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- شريط الأدوات العلوي -->
+    <div class="top-toolbar">
+        <div class="toolbar-group">
+            <button class="toolbar-btn primary" id="editModeBtn">🎨 وضع التعديل</button>
+            <button class="toolbar-btn" id="gridBtn">📐 إظهار الشبكة</button>
+            <button class="toolbar-btn" id="undoBtn" disabled>↶ تراجع</button>
+            <button class="toolbar-btn" id="redoBtn" disabled>↷ إعادة</button>
+        </div>
+
+        <div class="toolbar-group">
+            <select id="templateSelect" class="property-input" style="width: auto;">
+                <option value="">اختر قالب...</option>
+                <option value="certificate">شهادة سلبية</option>
+                <option value="document">بطاقة عقارية</option>
+                <option value="national-form">نموذج إدارة الأملاك</option>
+            </select>
+        </div>
+
+        <div class="toolbar-group">
+            <button class="toolbar-btn success" id="saveBtn">💾 حفظ</button>
+            <button class="toolbar-btn" id="loadBtn">📂 تحميل</button>
+            <button class="toolbar-btn" id="exportBtn">📤 تصدير JSON</button>
+            <button class="toolbar-btn" id="importBtn">📥 استيراد JSON</button>
+            <button class="toolbar-btn" id="pdfBtn">📄 تصدير PDF</button>
+            <button class="toolbar-btn danger" id="resetBtn">🔄 إعادة تعيين</button>
+        </div>
+    </div>
+
+    <!-- منطقة العمل الرئيسية -->
+    <div class="editor-workspace">
+        <!-- الشريط الجانبي للأدوات -->
+        <div class="sidebar-tools">
+            <!-- أدوات إضافة العناصر -->
+            <div class="tool-section">
+                <h3>إضافة عناصر</h3>
+                <div class="tool-grid">
+                    <div class="tool-item" data-tool="text">
+                        <div class="tool-icon">📝</div>
+                        <div class="tool-name">نص</div>
+                    </div>
+                    <div class="tool-item" data-tool="title">
+                        <div class="tool-icon">📰</div>
+                        <div class="tool-name">عنوان</div>
+                    </div>
+                    <div class="tool-item" data-tool="shape">
+                        <div class="tool-icon">⬜</div>
+                        <div class="tool-name">شكل</div>
+                    </div>
+                    <div class="tool-item" data-tool="line">
+                        <div class="tool-icon">➖</div>
+                        <div class="tool-name">خط</div>
+                    </div>
+                    <div class="tool-item" data-tool="table">
+                        <div class="tool-icon">📊</div>
+                        <div class="tool-name">جدول</div>
+                    </div>
+                    <div class="tool-item" data-tool="signature">
+                        <div class="tool-icon">✍️</div>
+                        <div class="tool-name">توقيع</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة خصائص العنصر المحدد -->
+            <div class="properties-panel" id="propertiesPanel">
+                <h3>خصائص العنصر</h3>
+
+                <!-- خصائص النص -->
+                <div class="property-group" id="textProperties">
+                    <label class="property-label">النص:</label>
+                    <textarea class="property-input" id="textContent" rows="3"></textarea>
+
+                    <label class="property-label">الخط:</label>
+                    <select class="property-input" id="fontFamily">
+                        <option value="Tajawal">Tajawal</option>
+                        <option value="Amiri">Amiri</option>
+                        <option value="Cairo">Cairo</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                    </select>
+
+                    <div class="font-controls">
+                        <div>
+                            <label class="property-label">الحجم:</label>
+                            <input type="number" class="property-input" id="fontSize" min="8" max="72" value="16">
+                        </div>
+                        <div>
+                            <label class="property-label">الوزن:</label>
+                            <select class="property-input" id="fontWeight">
+                                <option value="normal">عادي</option>
+                                <option value="bold">عريض</option>
+                                <option value="600">متوسط</option>
+                                <option value="300">خفيف</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <label class="property-label">لون النص:</label>
+                    <div class="color-picker-group">
+                        <input type="color" class="color-picker" id="textColor" value="#000000">
+                        <input type="text" class="property-input" id="textColorHex" value="#000000" style="flex: 1;">
+                    </div>
+
+                    <label class="property-label">محاذاة النص:</label>
+                    <select class="property-input" id="textAlign">
+                        <option value="right">يمين</option>
+                        <option value="center">وسط</option>
+                        <option value="left">يسار</option>
+                        <option value="justify">ضبط</option>
+                    </select>
+                </div>
+
+                <!-- خصائص الشكل -->
+                <div class="property-group" id="shapeProperties">
+                    <label class="property-label">لون الخلفية:</label>
+                    <div class="color-picker-group">
+                        <input type="color" class="color-picker" id="backgroundColor" value="#ffffff">
+                        <input type="text" class="property-input" id="backgroundColorHex" value="#ffffff"
+                            style="flex: 1;">
+                    </div>
+
+                    <label class="property-label">لون الحدود:</label>
+                    <div class="color-picker-group">
+                        <input type="color" class="color-picker" id="borderColor" value="#000000">
+                        <input type="text" class="property-input" id="borderColorHex" value="#000000" style="flex: 1;">
+                    </div>
+
+                    <label class="property-label">سمك الحدود:</label>
+                    <input type="number" class="property-input" id="borderWidth" min="0" max="10" value="1">
+
+                    <label class="property-label">نوع الحدود:</label>
+                    <select class="property-input" id="borderStyle">
+                        <option value="solid">مصمت</option>
+                        <option value="dashed">متقطع</option>
+                        <option value="dotted">منقط</option>
+                        <option value="none">بدون</option>
+                    </select>
+                </div>
+
+                <!-- خصائص الموضع والحجم -->
+                <div class="property-group" id="positionProperties">
+                    <div class="font-controls">
+                        <div>
+                            <label class="property-label">X:</label>
+                            <input type="number" class="property-input" id="positionX" value="0">
+                        </div>
+                        <div>
+                            <label class="property-label">Y:</label>
+                            <input type="number" class="property-input" id="positionY" value="0">
+                        </div>
+                    </div>
+
+                    <div class="font-controls">
+                        <div>
+                            <label class="property-label">العرض:</label>
+                            <input type="number" class="property-input" id="elementWidth" min="10" value="100">
+                        </div>
+                        <div>
+                            <label class="property-label">الارتفاع:</label>
+                            <input type="number" class="property-input" id="elementHeight" min="10" value="50">
+                        </div>
+                    </div>
+
+                    <label class="property-label">الدوران (درجة):</label>
+                    <input type="number" class="property-input" id="rotation" min="-360" max="360" value="0">
+
+                    <label class="property-label">الشفافية:</label>
+                    <input type="range" class="property-input" id="opacity" min="0" max="1" step="0.1" value="1">
+                </div>
+            </div>
+        </div>
+
+        <!-- منطقة الكانفاس -->
+        <div class="canvas-area">
+            <div class="canvas-page" id="canvasPage">
+                <div class="grid-overlay"></div>
+                <!-- العناصر ستضاف هنا ديناميكياً -->
+            </div>
+        </div>
+    </div>
+
+    <!-- قائمة السياق -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-action="copy">📋 نسخ</div>
+        <div class="context-menu-item" data-action="paste">📄 لصق</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="duplicate">📑 تكرار</div>
+        <div class="context-menu-item" data-action="delete">🗑️ حذف</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" data-action="bring-front">⬆️ إحضار للأمام</div>
+        <div class="context-menu-item" data-action="send-back">⬇️ إرسال للخلف</div>
+    </div>
+
+    <!-- حقل رفع الملفات المخفي -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;">
+
+    <script>
+        // متغيرات عامة
+        let editMode = false;
+        let selectedElement = null;
+        let elementCounter = 0;
+        let undoStack = [];
+        let redoStack = [];
+        let clipboard = null;
+        let currentTemplate = null;
+
+        // العناصر
+        const canvasPage = document.getElementById('canvasPage');
+        const propertiesPanel = document.getElementById('propertiesPanel');
+        const contextMenu = document.getElementById('contextMenu');
+
+        // الأزرار
+        const editModeBtn = document.getElementById('editModeBtn');
+        const gridBtn = document.getElementById('gridBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const loadBtn = document.getElementById('loadBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const pdfBtn = document.getElementById('pdfBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const templateSelect = document.getElementById('templateSelect');
+
+        // تفعيل/إلغاء وضع التعديل
+        editModeBtn.addEventListener('click', () => {
+            editMode = !editMode;
+            document.body.classList.toggle('edit-mode', editMode);
+            editModeBtn.textContent = editMode ? '🔒 إيقاف التعديل' : '🎨 وضع التعديل';
+            editModeBtn.classList.toggle('primary', editMode);
+
+            if (!editMode) {
+                clearSelection();
+            }
+        });
+
+        // إظهار/إخفاء الشبكة
+        gridBtn.addEventListener('click', () => {
+            canvasPage.classList.toggle('show-grid');
+            gridBtn.classList.toggle('primary');
+        });
+
+        // إضافة العناصر
+        document.querySelectorAll('.tool-item').forEach(tool => {
+            tool.addEventListener('click', () => {
+                if (!editMode) {
+                    alert('يجب تفعيل وضع التعديل أولاً');
+                    return;
+                }
+
+                const toolType = tool.dataset.tool;
+                addElement(toolType);
+            });
+        });
+
+        // اختيار القالب
+        templateSelect.addEventListener('change', (e) => {
+            const templateType = e.target.value;
+            if (templateType) {
+                loadTemplate(templateType);
+            }
+        });
+
+        // وظائف إضافة العناصر
+        function addElement(type) {
+            const element = document.createElement('div');
+            element.className = 'draggable-element';
+            element.dataset.type = type;
+            element.dataset.id = `element_${++elementCounter}`;
+
+            // إضافة أدوات التحكم
+            const controls = document.createElement('div');
+            controls.className = 'element-controls';
+            controls.innerHTML = `
+                <button class="control-btn" onclick="duplicateElement('${element.dataset.id}')">📑</button>
+                <button class="control-btn danger" onclick="deleteElement('${element.dataset.id}')">🗑️</button>
+            `;
+            element.appendChild(controls);
+
+            // تحديد نوع العنصر
+            switch (type) {
+                case 'text':
+                    element.innerHTML += '<div class="text-element" contenteditable="true">نص جديد</div>';
+                    element.style.width = '200px';
+                    element.style.height = '50px';
+                    break;
+                case 'title':
+                    element.innerHTML += '<div class="text-element" contenteditable="true" style="font-size: 24px; font-weight: bold;">عنوان جديد</div>';
+                    element.style.width = '300px';
+                    element.style.height = '60px';
+                    break;
+                case 'shape':
+                    element.classList.add('shape-element');
+                    element.style.backgroundColor = '#f0f0f0';
+                    element.style.border = '2px solid #333';
+                    element.style.width = '100px';
+                    element.style.height = '100px';
+                    break;
+                case 'line':
+                    element.style.height = '2px';
+                    element.style.width = '200px';
+                    element.style.backgroundColor = '#333';
+                    break;
+                case 'table':
+                    element.innerHTML += `
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="border: 1px solid #333; padding: 5px;">خلية 1</td><td style="border: 1px solid #333; padding: 5px;">خلية 2</td></tr>
+                            <tr><td style="border: 1px solid #333; padding: 5px;">خلية 3</td><td style="border: 1px solid #333; padding: 5px;">خلية 4</td></tr>
+                        </table>
+                    `;
+                    element.style.width = '200px';
+                    element.style.height = '100px';
+                    break;
+                case 'signature':
+                    element.innerHTML += '<div class="text-element" style="border-top: 1px solid #333; padding-top: 10px; text-align: center;">التوقيع</div>';
+                    element.style.width = '150px';
+                    element.style.height = '80px';
+                    break;
+            }
+
+            // موضع ابتدائي
+            element.style.left = '50px';
+            element.style.top = '50px';
+
+            // إضافة للكانفاس
+            canvasPage.appendChild(element);
+
+            // تفعيل التفاعل
+            makeElementInteractive(element);
+
+            // تحديد العنصر
+            selectElement(element);
+
+            // حفظ في التاريخ
+            saveState();
+        }
+
+        // تفعيل التفاعل مع العناصر
+        function makeElementInteractive(element) {
+            interact(element)
+                .draggable({
+                    listeners: {
+                        move(event) {
+                            if (!editMode) return;
+
+                            const target = event.target;
+                            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                            target.style.transform = `translate(${x}px, ${y}px)`;
+                            target.setAttribute('data-x', x);
+                            target.setAttribute('data-y', y);
+
+                            updatePropertiesPanel();
+                        }
+                    }
+                })
+                .resizable({
+                    edges: { left: true, right: true, bottom: true, top: true },
+                    listeners: {
+                        move(event) {
+                            if (!editMode) return;
+
+                            const target = event.target;
+                            let x = (parseFloat(target.getAttribute('data-x')) || 0);
+                            let y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+                            target.style.width = event.rect.width + 'px';
+                            target.style.height = event.rect.height + 'px';
+
+                            x += event.deltaRect.left;
+                            y += event.deltaRect.top;
+
+                            target.style.transform = `translate(${x}px, ${y}px)`;
+                            target.setAttribute('data-x', x);
+                            target.setAttribute('data-y', y);
+
+                            updatePropertiesPanel();
+                        }
+                    },
+                    modifiers: [
+                        interact.modifiers.restrictSize({
+                            min: { width: 20, height: 20 }
+                        })
+                    ]
+                });
+
+            // النقر لتحديد العنصر
+            element.addEventListener('click', (e) => {
+                if (!editMode) return;
+                e.stopPropagation();
+                selectElement(element);
+            });
+
+            // قائمة السياق
+            element.addEventListener('contextmenu', (e) => {
+                if (!editMode) return;
+                e.preventDefault();
+                showContextMenu(e.clientX, e.clientY, element);
+            });
+        }
+
+        // تحديد عنصر
+        function selectElement(element) {
+            clearSelection();
+            selectedElement = element;
+            element.classList.add('selected');
+            showPropertiesPanel();
+            updatePropertiesPanel();
+        }
+
+        // إلغاء التحديد
+        function clearSelection() {
+            document.querySelectorAll('.draggable-element.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            selectedElement = null;
+            hidePropertiesPanel();
+        }
+
+        // إظهار لوحة الخصائص
+        function showPropertiesPanel() {
+            propertiesPanel.classList.add('active');
+        }
+
+        // إخفاء لوحة الخصائص
+        function hidePropertiesPanel() {
+            propertiesPanel.classList.remove('active');
+        }
+
+        // تحديث لوحة الخصائص
+        function updatePropertiesPanel() {
+            if (!selectedElement) return;
+
+            const textElement = selectedElement.querySelector('.text-element');
+            const computedStyle = window.getComputedStyle(selectedElement);
+
+            // خصائص الموضع
+            const x = parseFloat(selectedElement.getAttribute('data-x')) || 0;
+            const y = parseFloat(selectedElement.getAttribute('data-y')) || 0;
+            document.getElementById('positionX').value = Math.round(x);
+            document.getElementById('positionY').value = Math.round(y);
+            document.getElementById('elementWidth').value = Math.round(parseFloat(computedStyle.width));
+            document.getElementById('elementHeight').value = Math.round(parseFloat(computedStyle.height));
+
+            // خصائص النص
+            if (textElement) {
+                document.getElementById('textContent').value = textElement.textContent;
+                document.getElementById('fontFamily').value = computedStyle.fontFamily.replace(/"/g, '');
+                document.getElementById('fontSize').value = parseInt(computedStyle.fontSize);
+                document.getElementById('fontWeight').value = computedStyle.fontWeight;
+                document.getElementById('textColor').value = rgbToHex(computedStyle.color);
+                document.getElementById('textColorHex').value = rgbToHex(computedStyle.color);
+                document.getElementById('textAlign').value = computedStyle.textAlign;
+            }
+
+            // خصائص الشكل
+            document.getElementById('backgroundColor').value = rgbToHex(computedStyle.backgroundColor);
+            document.getElementById('backgroundColorHex').value = rgbToHex(computedStyle.backgroundColor);
+            document.getElementById('borderColor').value = rgbToHex(computedStyle.borderColor);
+            document.getElementById('borderColorHex').value = rgbToHex(computedStyle.borderColor);
+            document.getElementById('borderWidth').value = parseInt(computedStyle.borderWidth) || 0;
+            document.getElementById('opacity').value = computedStyle.opacity;
+        }
+
+        // تطبيق التغييرات من لوحة الخصائص
+        function setupPropertyListeners() {
+            // خصائص النص
+            document.getElementById('textContent').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.textContent = e.target.value;
+                    }
+                }
+            });
+
+            document.getElementById('fontFamily').addEventListener('change', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.style.fontFamily = e.target.value;
+                    }
+                }
+            });
+
+            document.getElementById('fontSize').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.style.fontSize = e.target.value + 'px';
+                    }
+                }
+            });
+
+            document.getElementById('fontWeight').addEventListener('change', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.style.fontWeight = e.target.value;
+                    }
+                }
+            });
+
+            document.getElementById('textColor').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.style.color = e.target.value;
+                    }
+                    document.getElementById('textColorHex').value = e.target.value;
+                }
+            });
+
+            document.getElementById('textAlign').addEventListener('change', (e) => {
+                if (selectedElement) {
+                    const textElement = selectedElement.querySelector('.text-element');
+                    if (textElement) {
+                        textElement.style.textAlign = e.target.value;
+                    }
+                }
+            });
+
+            // خصائص الشكل
+            document.getElementById('backgroundColor').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.backgroundColor = e.target.value;
+                    document.getElementById('backgroundColorHex').value = e.target.value;
+                }
+            });
+
+            document.getElementById('borderColor').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.borderColor = e.target.value;
+                    document.getElementById('borderColorHex').value = e.target.value;
+                }
+            });
+
+            document.getElementById('borderWidth').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.borderWidth = e.target.value + 'px';
+                }
+            });
+
+            document.getElementById('borderStyle').addEventListener('change', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.borderStyle = e.target.value;
+                }
+            });
+
+            // خصائص الموضع
+            document.getElementById('positionX').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    const y = parseFloat(selectedElement.getAttribute('data-y')) || 0;
+                    selectedElement.style.transform = `translate(${e.target.value}px, ${y}px)`;
+                    selectedElement.setAttribute('data-x', e.target.value);
+                }
+            });
+
+            document.getElementById('positionY').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    const x = parseFloat(selectedElement.getAttribute('data-x')) || 0;
+                    selectedElement.style.transform = `translate(${x}px, ${e.target.value}px)`;
+                    selectedElement.setAttribute('data-y', e.target.value);
+                }
+            });
+
+            document.getElementById('elementWidth').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.width = e.target.value + 'px';
+                }
+            });
+
+            document.getElementById('elementHeight').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.height = e.target.value + 'px';
+                }
+            });
+
+            document.getElementById('opacity').addEventListener('input', (e) => {
+                if (selectedElement) {
+                    selectedElement.style.opacity = e.target.value;
+                }
+            });
+        }
+
+        // وظائف مساعدة
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+            const result = rgb.match(/\d+/g);
+            if (!result) return '#000000';
+            return '#' + result.map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+        }
+
+        // قائمة السياق
+        function showContextMenu(x, y, element) {
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.style.display = 'block';
+            contextMenu.dataset.targetId = element.dataset.id;
+        }
+
+        function hideContextMenu() {
+            contextMenu.style.display = 'none';
+        }
+
+        // أحداث قائمة السياق
+        document.querySelectorAll('.context-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const action = e.target.dataset.action;
+                const targetId = contextMenu.dataset.targetId;
+                const element = document.querySelector(`[data-id="${targetId}"]`);
+
+                switch (action) {
+                    case 'copy':
+                        copyElement(element);
+                        break;
+                    case 'paste':
+                        pasteElement();
+                        break;
+                    case 'duplicate':
+                        duplicateElement(targetId);
+                        break;
+                    case 'delete':
+                        deleteElement(targetId);
+                        break;
+                    case 'bring-front':
+                        element.style.zIndex = (parseInt(element.style.zIndex) || 0) + 1;
+                        break;
+                    case 'send-back':
+                        element.style.zIndex = (parseInt(element.style.zIndex) || 0) - 1;
+                        break;
+                }
+
+                hideContextMenu();
+            });
+        });
+
+        // وظائف العمليات
+        function copyElement(element) {
+            clipboard = element.cloneNode(true);
+        }
+
+        function pasteElement() {
+            if (!clipboard) return;
+
+            const newElement = clipboard.cloneNode(true);
+            newElement.dataset.id = `element_${++elementCounter}`;
+
+            // إزاحة بسيطة
+            const x = (parseFloat(clipboard.getAttribute('data-x')) || 0) + 20;
+            const y = (parseFloat(clipboard.getAttribute('data-y')) || 0) + 20;
+            newElement.style.transform = `translate(${x}px, ${y}px)`;
+            newElement.setAttribute('data-x', x);
+            newElement.setAttribute('data-y', y);
+
+            canvasPage.appendChild(newElement);
+            makeElementInteractive(newElement);
+            selectElement(newElement);
+            saveState();
+        }
+
+        window.duplicateElement = function (elementId) {
+            const element = document.querySelector(`[data-id="${elementId}"]`);
+            if (element) {
+                copyElement(element);
+                pasteElement();
+            }
+        }
+
+        window.deleteElement = function (elementId) {
+            const element = document.querySelector(`[data-id="${elementId}"]`);
+            if (element) {
+                element.remove();
+                clearSelection();
+                saveState();
+            }
+        }
+
+        // حفظ وتحميل الحالة
+        function saveState() {
+            const state = {
+                elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
+                    id: el.dataset.id,
+                    type: el.dataset.type,
+                    html: el.innerHTML,
+                    style: el.style.cssText,
+                    x: el.getAttribute('data-x'),
+                    y: el.getAttribute('data-y')
+                }))
+            };
+
+            undoStack.push(JSON.stringify(state));
+            if (undoStack.length > 50) undoStack.shift();
+            redoStack = [];
+
+            updateUndoRedoButtons();
+        }
+
+        function loadState(stateString) {
+            const state = JSON.parse(stateString);
+
+            // مسح العناصر الحالية
+            canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
+
+            // إضافة العناصر المحفوظة
+            state.elements.forEach(elementData => {
+                const element = document.createElement('div');
+                element.className = 'draggable-element';
+                element.dataset.id = elementData.id;
+                element.dataset.type = elementData.type;
+                element.innerHTML = elementData.html;
+                element.style.cssText = elementData.style;
+                element.setAttribute('data-x', elementData.x);
+                element.setAttribute('data-y', elementData.y);
+
+                canvasPage.appendChild(element);
+                makeElementInteractive(element);
+            });
+
+            clearSelection();
+        }
+
+        function updateUndoRedoButtons() {
+            undoBtn.disabled = undoStack.length <= 1;
+            redoBtn.disabled = redoStack.length === 0;
+        }
+
+        // أحداث الحفظ والتحميل
+        saveBtn.addEventListener('click', () => {
+            const state = {
+                template: currentTemplate,
+                elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
+                    id: el.dataset.id,
+                    type: el.dataset.type,
+                    html: el.innerHTML,
+                    style: el.style.cssText,
+                    x: el.getAttribute('data-x'),
+                    y: el.getAttribute('data-y')
+                }))
+            };
+
+            localStorage.setItem('templateEditor_advanced', JSON.stringify(state));
+            alert('تم حفظ القالب بنجاح!');
+        });
+
+        loadBtn.addEventListener('click', () => {
+            const saved = localStorage.getItem('templateEditor_advanced');
+            if (saved) {
+                loadState(saved);
+                alert('تم تحميل القالب بنجاح!');
+            } else {
+                alert('لا يوجد قالب محفوظ!');
+            }
+        });
+
+        exportBtn.addEventListener('click', () => {
+            const state = {
+                template: currentTemplate,
+                elements: Array.from(canvasPage.querySelectorAll('.draggable-element')).map(el => ({
+                    id: el.dataset.id,
+                    type: el.dataset.type,
+                    html: el.innerHTML,
+                    style: el.style.cssText,
+                    x: el.getAttribute('data-x'),
+                    y: el.getAttribute('data-y')
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'template-design.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        importBtn.addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        loadState(e.target.result);
+                        alert('تم استيراد القالب بنجاح!');
+                    } catch (error) {
+                        alert('خطأ في استيراد الملف!');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        pdfBtn.addEventListener('click', async () => {
+            const canvas = await html2canvas(canvasPage, {
+                scale: 2,
+                backgroundColor: '#ffffff'
+            });
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            pdf.save('template-design.pdf');
+        });
+
+        resetBtn.addEventListener('click', () => {
+            if (confirm('هل أنت متأكد من إعادة تعيين كل شيء؟')) {
+                canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
+                clearSelection();
+                elementCounter = 0;
+                undoStack = [];
+                redoStack = [];
+                updateUndoRedoButtons();
+                templateSelect.value = '';
+                currentTemplate = null;
+            }
+        });
+
+        // تراجع وإعادة
+        undoBtn.addEventListener('click', () => {
+            if (undoStack.length > 1) {
+                redoStack.push(undoStack.pop());
+                loadState(undoStack[undoStack.length - 1]);
+                updateUndoRedoButtons();
+            }
+        });
+
+        redoBtn.addEventListener('click', () => {
+            if (redoStack.length > 0) {
+                const state = redoStack.pop();
+                undoStack.push(state);
+                loadState(state);
+                updateUndoRedoButtons();
+            }
+        });
+
+        // تحميل القوالب الجاهزة
+        function loadTemplate(templateType) {
+            currentTemplate = templateType;
+
+            // مسح العناصر الحالية
+            canvasPage.querySelectorAll('.draggable-element').forEach(el => el.remove());
+
+            switch (templateType) {
+                case 'certificate':
+                    loadCertificateTemplate();
+                    break;
+                case 'document':
+                    loadDocumentTemplate();
+                    break;
+                case 'national-form':
+                    loadNationalFormTemplate();
+                    break;
+            }
+
+            saveState();
+        }
+
+        function loadCertificateTemplate() {
+            // إضافة عناصر الشهادة السلبية
+            addTemplateElement('title', 'الجمهورية الجزائرية الديمقراطية الشعبية', 50, 30, 500, 40);
+            addTemplateElement('title', 'المحافظة العقارية', 50, 80, 500, 35);
+            addTemplateElement('title', 'شهادة سلبية', 50, 130, 500, 30);
+            addTemplateElement('text', 'نشهد بأنه لا توجد أي ملكية عقارية مسجلة باسم:', 50, 200, 500, 25);
+            addTemplateElement('text', 'اللقب: ___________________', 50, 250, 400, 25);
+            addTemplateElement('text', 'الاسم: ___________________', 50, 290, 400, 25);
+            addTemplateElement('text', 'اسم الأب: ___________________', 50, 330, 400, 25);
+            addTemplateElement('text', 'تاريخ الميلاد: ___________________', 50, 370, 400, 25);
+            addTemplateElement('text', 'مكان الميلاد: ___________________', 50, 410, 400, 25);
+        }
+
+        function loadDocumentTemplate() {
+            // إضافة عناصر البطاقة العقارية
+            addTemplateElement('title', 'الجمهورية الجزائرية الديمقراطية الشعبية', 50, 30, 500, 40);
+            addTemplateElement('title', 'المحافظة العقارية', 50, 80, 500, 35);
+            addTemplateElement('title', 'البطاقة العقارية', 50, 130, 500, 30);
+            addTemplateElement('text', 'بيانات مقدم الطلب:', 50, 200, 200, 25);
+            addTemplateElement('text', 'اللقب: ___________________', 50, 230, 400, 25);
+            addTemplateElement('text', 'الاسم: ___________________', 50, 260, 400, 25);
+        }
+
+        function loadNationalFormTemplate() {
+            // إضافة عناصر نموذج إدارة الأملاك (مبسط)
+            addTemplateElement('title', 'إدارة الأملاك الوطنية', 50, 30, 500, 40);
+            addTemplateElement('text', 'طلب معلومات موجزة', 50, 100, 300, 30);
+            addTemplateElement('text', 'أنا الممضي أسفله: ___________________', 50, 150, 400, 25);
+            addTemplateElement('text', 'الساكن بـ: ___________________', 50, 180, 400, 25);
+            addTemplateElement('text', 'أطلب مستخرجا من:', 50, 220, 300, 25);
+        }
+
+        function addTemplateElement(type, text, x, y, width, height) {
+            const element = document.createElement('div');
+            element.className = 'draggable-element';
+            element.dataset.type = type;
+            element.dataset.id = `element_${++elementCounter}`;
+
+            // إضافة أدوات التحكم
+            const controls = document.createElement('div');
+            controls.className = 'element-controls';
+            controls.innerHTML = `
+                <button class="control-btn" onclick="duplicateElement('${element.dataset.id}')">📑</button>
+                <button class="control-btn danger" onclick="deleteElement('${element.dataset.id}')">🗑️</button>
+            `;
+            element.appendChild(controls);
+
+            // إضافة المحتوى
+            const textElement = document.createElement('div');
+            textElement.className = 'text-element';
+            textElement.contentEditable = true;
+            textElement.textContent = text;
+
+            if (type === 'title') {
+                textElement.style.fontSize = '20px';
+                textElement.style.fontWeight = 'bold';
+                textElement.style.textAlign = 'center';
+            }
+
+            element.appendChild(textElement);
+
+            // تحديد الموضع والحجم
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+            element.style.width = width + 'px';
+            element.style.height = height + 'px';
+            element.setAttribute('data-x', 0);
+            element.setAttribute('data-y', 0);
+
+            // إضافة للكانفاس
+            canvasPage.appendChild(element);
+            makeElementInteractive(element);
+        }
+
+        // إخفاء قائمة السياق عند النقر خارجها
+        document.addEventListener('click', hideContextMenu);
+        canvasPage.addEventListener('click', clearSelection);
+
+        // تهيئة المحرر
+        function initEditor() {
+            setupPropertyListeners();
+            updateUndoRedoButtons();
+
+            // تحميل آخر حالة محفوظة
+            const saved = localStorage.getItem('templateEditor_advanced');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (state.template) {
+                        templateSelect.value = state.template;
+                        currentTemplate = state.template;
+                    }
+                    loadState(saved);
+                } catch (e) {
+                    console.error('Error loading saved state:', e);
+                }
+            }
+        }
+
+        // بدء المحرر
+        initEditor();
+    </script>
+</body>
+
+</html>
