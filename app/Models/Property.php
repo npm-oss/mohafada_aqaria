@@ -13,7 +13,7 @@ class Property extends Model
  'owner_birthdate','owner_birthplace',
  'property_status','section','municipality','plan_number','parcel_number',
  'municipality_ns','subdivision_number','parcel_number_ns',
- 'card_type','card_image'
+ 'card_type','card_image','card_image_2'
 ];
 
 }

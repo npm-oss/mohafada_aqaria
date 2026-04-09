@@ -14,7 +14,7 @@ class AdminController extends Controller
     {
         // احضري إحصائيات بسيطة
         $usersCount = \DB::table('users')->count();
-        $messagesCount = \DB::table('contacts')->count() ?? 0;
+        $messagesCount = \DB::table('contact_messages')->count() ?? 0;
         $appointmentsCount = \DB::table('appointments')->count() ?? 0;
 
         return view('admin.dashboard', compact('usersCount','messagesCount','appointmentsCount'));
@@ -22,7 +22,7 @@ class AdminController extends Controller
 
     public function messages()
     {
-        $messages = \DB::table('contacts')->orderBy('created_at','desc')->get();
+        $messages = \DB::table('contact_messages')->orderBy('created_at','desc')->get();
         return view('admin.messages', compact('messages'));
     }
 

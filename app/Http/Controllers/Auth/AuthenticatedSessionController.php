@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Models\WebsiteUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -14,40 +15,50 @@ class AuthenticatedSessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(LoginRequest $request)
-    {
-        // قائمة الأدمن الثابتين
-        $admins = [
-            ['email' => 'admin1@system.com', 'password' => 'admin123'],
-            ['email' => 'admin2@system.com', 'password' => 'admin456'],
-        ];
+    public function store(Request $request)
+{
+    $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        foreach ($admins as $admin) {
-            if (
-                $request->email === $admin['email'] &&
-                $request->password === $admin['password']
-            ) {
-                session([
-                    'admin_logged' => true,
-                    'admin_email' => $admin['email'],
-                ]);
+    // 1️⃣ هل هو أدمن؟
+    if (Auth::guard('web')->attempt([
+        'email'    => $request->email,
+        'password' => $request->password,
+    ])) {
+        $user = Auth::guard('web')->user();
 
-                return redirect()->route('admin.dashboard');
-            }
+        if ($user->is_admin == 1) {
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard'); // ← لوحة الأدمن
         }
 
-        // تسجيل مستخدم عادي
-        $request->authenticate();
-        $request->session()->regenerate();
-
-        return redirect()->route('dashboard');
+        Auth::guard('web')->logout();
+        return back()->withErrors([
+            'email' => 'ليس لديك صلاحية الدخول'
+        ]);
     }
+
+    // 2️⃣ هل هو مستخدم عادي؟
+    $websiteUser = \App\Models\WebsiteUser::where('email', $request->email)->first();
+
+    if ($websiteUser && \Illuminate\Support\Facades\Hash::check($request->password, $websiteUser->password)) {
+        Auth::guard('website')->login($websiteUser);
+        $request->session()->regenerate();
+        return redirect()->route('website.home'); // ← صفحة المستخدم
+    }
+
+    // 3️⃣ بيانات غلط
+    return back()->withErrors([
+        'email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+    ])->withInput();
+}
 
     public function destroy(Request $request)
     {
-        session()->forget('admin_logged');
-
         Auth::guard('web')->logout();
+        Auth::guard('website')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

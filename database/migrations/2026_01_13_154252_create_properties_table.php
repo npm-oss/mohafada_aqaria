@@ -37,6 +37,7 @@ class CreatePropertiesTable extends Migration
     // نوع البطاقة
     $table->string('card_type'); // personal, alphabetical, urban, rural
   $table->string('card_image')->nullable(); 
+   $table->string('card_image_2')->nullable(); 
     $table->timestamps();
 });
 

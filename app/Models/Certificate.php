@@ -9,14 +9,29 @@ class Certificate extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'owner_firstname',
-        'owner_lastname',
-        'owner_birthdate',
-        'owner_birthplace',
-        'result_type',
-        'certificate_data',
-        'status',
-        'certificate_issued_at',
-    ];
+  protected $fillable = [
+    'user_id',
+    // أي حقول موجودة...
+    
+    // الحقول الجديدة ⭐
+    'certificate_type',
+    'citizen_name',
+    'birth_info',
+    'father_name',
+    'mother_name',
+    'address',
+    'request_number',
+    'receipt_number',
+    'delivery_date',
+    'properties_data',
+    'notes',
+    'status',
+
+
+
+];
+protected $casts = [
+    'delivery_date' => 'date',
+    'properties_data' => 'array',  // مهم! تحويل JSON لـ array
+];
 }

@@ -36,7 +36,6 @@
 
     <a href="/admin/add-data" class="block px-6 py-3 hover:bg-gray-200">➕ إضافة بيانات</a>
     <a href="/admin/view-data" class="block px-6 py-3 hover:bg-gray-200">🗂 عرض البيانات</a>
-    <a href="{{ route('admin.templates.editor') }}" class="block px-6 py-3 hover:bg-gray-200">🎨 محرر القوالب</a>
     <a href="/admin/settings" class="block px-6 py-3 hover:bg-gray-200">⚙️ الإعدادات</a>
     <a href="/admin/change-password" class="block px-6 py-3 hover:bg-gray-200">🔐 تغيير كلمة المرور</a>
 

@@ -5,7 +5,7 @@
 <div class="bg-white shadow-md rounded-lg p-6">
 
     <h2 class="text-2xl font-bold mb-4 text-gray-700">
-        📄 طلبات استخراج الوثائق العقارية
+        📄 طلبات البطاقات العقارية
     </h2>
 
     @if(session('success'))

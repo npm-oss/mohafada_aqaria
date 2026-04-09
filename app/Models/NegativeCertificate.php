@@ -9,7 +9,11 @@ class NegativeCertificate extends Model
 {
     use HasFactory;
 
+    protected $table = 'negative_certificates';
+
     protected $fillable = [
+        'user_request_id', // 🔗 الربط مع صندوق الطلبات
+
         'owner_lastname',
         'owner_firstname',
         'owner_father',
@@ -22,7 +26,25 @@ class NegativeCertificate extends Model
 
         'email',
         'phone',
+
         'type',
         'status',
     ];
+
+
+
+    public function getFullNameAttribute()
+{
+    return trim(
+        ($this->owner_firstname ?? '') . ' ' .
+        ($this->owner_lastname ?? '') . ' ' .
+        ($this->owner_father ?? '')
+    );
+}
+
+    // العلاقة مع الطلب
+    public function userRequest()
+    {
+        return $this->belongsTo(UserRequest::class);
+    }
 }

@@ -10,15 +10,6 @@ return new class extends Migration
     {
         Schema::create('documents_requests', function (Blueprint $table) {
             $table->id();
-             Schema::table('documents_requests', function (Blueprint $table) {
-        $table->string('card_type')->nullable();
-    });
-    Schema::table('documents_requests', function (Blueprint $table) {
-            $table->string('applicant_type')->default('person')->after('type');
-        });
-        Schema::table('documents_requests', function (Blueprint $table) {
-            $table->string('owner_type')->default('person')->after('applicant_type');
-        });
 
             // صاحب الملكية
            $table->string('owner_nin');
@@ -67,19 +58,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('documents_requests');
- Schema::table('documents_requests', function (Blueprint $table) {
-        $table->dropColumn('card_type');
-        $table->dropColumn('property_status');
-    });
-     Schema::table('documents_requests', function (Blueprint $table) {
-            $table->dropColumn('applicant_type');
-        });
-        Schema::table('documents_requests', function (Blueprint $table) {
-            $table->dropColumn('owner_type');
-        });
     }
-   
-  
 };
 
 
